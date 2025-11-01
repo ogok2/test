@@ -77,7 +77,7 @@ const LivestockPlatform = () => {
     flavor: { intensity: null as number | null },
     cuts: { preferred: [] as string[] },
     cooking: { doneness: '', methods: [] as string[] },
-    value: { local: false, sustainability: false, value4money: false, premium: false },
+    value: { local: false, animalWelfare: false, lowCarbon: false, value4money: false, premium: false },
     price: { budget_band: '', pack_size: '' }
   });
   const [evaluation, setEvaluation] = useState<Evaluation>({
@@ -1182,7 +1182,7 @@ const LivestockPlatform = () => {
       preferredCuts: [] as string[],
       cookingDoneness: '',
       cookingMethods: [] as string[],
-      values: { local: false, sustainability: false, value4money: false, premium: false },
+      values: { local: false, animalWelfare: false, lowCarbon: false, value4money: false, premium: false },
       budgetBand: '',
       packSize: ''
     });
@@ -1255,12 +1255,13 @@ const LivestockPlatform = () => {
       },
       {
         id: 7,
-        title: '가치 지향',
-        question: '더 끌리는 가치는 무엇인가요? (다중 선택 가능)',
+        title: '구매결정요인',
+        question: '축산물 구매 시 어떤 요소가 구매 결정에 큰 영향을 미치나요?(복수 선택 가능)',
         type: 'multi',
         options: [
           { label: '지역 브랜드(○○축협)', key: 'local' },
-          { label: '동물복지·저메탄 사료', key: 'sustainability' },
+          { label: '동물복지', key: 'animalWelfare' },
+          { label: '저탄소축산물', key: 'lowCarbon' },
           { label: '합리적 가격', key: 'value4money' },
           { label: '한정·프리미엄', key: 'premium' }
         ],
@@ -1269,7 +1270,8 @@ const LivestockPlatform = () => {
             ...surveyData,
             values: {
               local: val.includes('local'),
-              sustainability: val.includes('sustainability'),
+              animalWelfare: val.includes('animalWelfare'),
+              lowCarbon: val.includes('lowCarbon'),
               value4money: val.includes('value4money'),
               premium: val.includes('premium')
             }
