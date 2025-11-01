@@ -88,6 +88,12 @@ const LivestockPlatform = () => {
     fatAmount: '' // 지방량은 어떤가요?
   });
   const [communityCategory, setCommunityCategory] = useState('all');
+  const [showSignup, setShowSignup] = useState(false);
+  const [signupData, setSignupData] = useState({
+    username: '',
+    password: '',
+    passwordConfirm: ''
+  });
 
   // 랜딩 페이지 (초기 화면)
   const LandingPage = () => (
@@ -384,9 +390,14 @@ const LivestockPlatform = () => {
           </div>
           <div className="relative">
             <input
-              type="text"
+              type="tel"
+              inputMode="numeric"
+              pattern="[0-9]*"
               value={traceNumber}
-              onChange={(e) => setTraceNumber(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value.replace(/[^0-9]/g, ''); // 숫자만 허용
+                setTraceNumber(value);
+              }}
               placeholder="이력번호를 입력해주세요."
               className="w-full px-4 py-4 pr-12 bg-transparent rounded-xl focus:outline-none text-sm text-gray-800 placeholder-gray-400"
             />
@@ -424,7 +435,10 @@ const LivestockPlatform = () => {
           <h3 className="text-xl font-bold mb-2">회원가입하고 2,000P 받기!</h3>
           <p className="text-sm opacity-90 mb-4">평가하고, 공유하고, 저탄소 축산물 구매까지!</p>
           <div className="flex gap-2">
-            <button className="flex-1 bg-white text-purple-600 font-bold py-3 rounded-xl hover:bg-gray-100 transition-colors">
+            <button 
+              onClick={() => setShowSignup(true)}
+              className="flex-1 bg-white text-purple-600 font-bold py-3 rounded-xl hover:bg-gray-100 transition-colors"
+            >
               회원가입 하기
             </button>
             <button className="flex-1 bg-white/20 backdrop-blur text-white font-semibold py-3 rounded-xl hover:bg-white/30 transition-colors">
@@ -1845,6 +1859,113 @@ const LivestockPlatform = () => {
     );
   };
 
+  // 회원가입 컴포넌트
+  const SignupModal = () => {
+    const [errors, setErrors] = useState({
+      username: '',
+      password: '',
+      passwordConfirm: ''
+    });
+
+    const handleSignup = () => {
+      const newErrors = {
+        username: '',
+        password: '',
+        passwordConfirm: ''
+      };
+
+      // 아이디 검증 (최소 4자)
+      if (signupData.username.length < 4) {
+        newErrors.username = '아이디는 최소 4자 이상이어야 합니다.';
+      }
+
+      // 비밀번호 검증 (최소 6자)
+      if (signupData.password.length < 6) {
+        newErrors.password = '비밀번호는 최소 6자 이상이어야 합니다.';
+      }
+
+      // 비밀번호 확인
+      if (signupData.password !== signupData.passwordConfirm) {
+        newErrors.passwordConfirm = '비밀번호가 일치하지 않습니다.';
+      }
+
+      setErrors(newErrors);
+
+      // 에러가 없으면 회원가입 완료
+      if (!newErrors.username && !newErrors.password && !newErrors.passwordConfirm) {
+        setUserPoints(prev => prev + 2000);
+        alert('회원가입 완료! 🎉\n2,000포인트가 적립되었습니다!');
+        setShowSignup(false);
+        setSignupData({ username: '', password: '', passwordConfirm: '' });
+        setErrors({ username: '', password: '', passwordConfirm: '' });
+      }
+    };
+
+    return (
+      <div className="fixed inset-0 bg-black/50 z-[200] flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl p-6 w-full max-w-md relative">
+          <button
+            onClick={() => {
+              setShowSignup(false);
+              setSignupData({ username: '', password: '', passwordConfirm: '' });
+              setErrors({ username: '', password: '', passwordConfirm: '' });
+            }}
+            className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl"
+          >
+            ✕
+          </button>
+          
+          <h2 className="text-2xl font-bold mb-4">회원가입</h2>
+          
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-semibold mb-2 text-gray-800">아이디</label>
+              <input
+                type="text"
+                value={signupData.username}
+                onChange={(e) => setSignupData({...signupData, username: e.target.value})}
+                placeholder="아이디를 입력하세요 (최소 4자)"
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-500 text-sm"
+              />
+              {errors.username && <p className="text-red-500 text-xs mt-1">{errors.username}</p>}
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold mb-2 text-gray-800">비밀번호</label>
+              <input
+                type="password"
+                value={signupData.password}
+                onChange={(e) => setSignupData({...signupData, password: e.target.value})}
+                placeholder="비밀번호를 입력하세요 (최소 6자)"
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-500 text-sm"
+              />
+              {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold mb-2 text-gray-800">비밀번호 확인</label>
+              <input
+                type="password"
+                value={signupData.passwordConfirm}
+                onChange={(e) => setSignupData({...signupData, passwordConfirm: e.target.value})}
+                placeholder="비밀번호를 다시 입력하세요"
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-500 text-sm"
+              />
+              {errors.passwordConfirm && <p className="text-red-500 text-xs mt-1">{errors.passwordConfirm}</p>}
+            </div>
+
+            <button
+              onClick={handleSignup}
+              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 rounded-xl hover:from-purple-700 hover:to-pink-700 transition-colors"
+            >
+              회원가입하고 2,000P 받기
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   // 랜딩 화면 표시
   if (showLanding) {
     return (
@@ -1879,6 +2000,9 @@ const LivestockPlatform = () => {
           {activeTab === 'profile' && <ProfilePage />}
         </div>
       </div>
+
+      {/* 회원가입 모달 */}
+      {showSignup && <SignupModal />}
 
       {/* 하단 네비게이션 - 화면 하단에 완전 고정 */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-100 z-[100] shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
