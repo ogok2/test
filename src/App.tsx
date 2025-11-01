@@ -96,6 +96,7 @@ const LivestockPlatform = () => {
     passwordConfirm: ''
   });
   const [selectedMarketProductFromHome, setSelectedMarketProductFromHome] = useState<Product | null>(null);
+  const [receiptStep, setReceiptStep] = useState<'scan' | 'result'>('scan'); // 영수증 인증 단계
 
   // 랜딩 페이지 (초기 화면)
   const LandingPage = () => (
