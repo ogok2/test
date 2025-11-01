@@ -91,6 +91,7 @@ const LivestockPlatform = () => {
   const [showSignup, setShowSignup] = useState(false);
   const [signupData, setSignupData] = useState({
     username: '',
+    nickname: '',
     password: '',
     passwordConfirm: ''
   });
@@ -128,7 +129,7 @@ const LivestockPlatform = () => {
               <div className="text-xs text-gray-500 mb-2 font-semibold tracking-wider uppercase">기본 정보</div>
               <p className="text-sm text-gray-700 leading-relaxed">
                 이 고기는 <span className="font-bold text-green-600">2024년 10월</span>에 도축된 
-                <span className="font-bold text-green-600"> 1++등급 한우</span>입니다.
+                <span className="font-bold text-green-600"> '28개월령' 1++등급 한우</span>입니다.
                 <br />
                 <span className="inline-block mt-3 px-4 py-1.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full text-xs font-bold shadow-md">
                   ✓ 동물복지 인증 농장
@@ -1863,6 +1864,7 @@ const LivestockPlatform = () => {
   const SignupModal = () => {
     const [errors, setErrors] = useState({
       username: '',
+      nickname: '',
       password: '',
       passwordConfirm: ''
     });
@@ -1870,6 +1872,7 @@ const LivestockPlatform = () => {
     const handleSignup = () => {
       const newErrors = {
         username: '',
+        nickname: '',
         password: '',
         passwordConfirm: ''
       };
@@ -1877,6 +1880,11 @@ const LivestockPlatform = () => {
       // 아이디 검증 (최소 4자)
       if (signupData.username.length < 4) {
         newErrors.username = '아이디는 최소 4자 이상이어야 합니다.';
+      }
+
+      // 닉네임 검증 (최소 2자)
+      if (signupData.nickname.length < 2) {
+        newErrors.nickname = '닉네임은 최소 2자 이상이어야 합니다.';
       }
 
       // 비밀번호 검증 (최소 6자)
@@ -1892,46 +1900,58 @@ const LivestockPlatform = () => {
       setErrors(newErrors);
 
       // 에러가 없으면 회원가입 완료
-      if (!newErrors.username && !newErrors.password && !newErrors.passwordConfirm) {
+      if (!newErrors.username && !newErrors.nickname && !newErrors.password && !newErrors.passwordConfirm) {
         setUserPoints(prev => prev + 2000);
         alert('회원가입 완료! 🎉\n2,000포인트가 적립되었습니다!');
         setShowSignup(false);
-        setSignupData({ username: '', password: '', passwordConfirm: '' });
-        setErrors({ username: '', password: '', passwordConfirm: '' });
+        setSignupData({ username: '', nickname: '', password: '', passwordConfirm: '' });
+        setErrors({ username: '', nickname: '', password: '', passwordConfirm: '' });
       }
     };
 
     return (
       <div className="fixed inset-0 bg-black/50 z-[200] flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl p-6 w-full max-w-md relative">
-          <button
-            onClick={() => {
-              setShowSignup(false);
-              setSignupData({ username: '', password: '', passwordConfirm: '' });
-              setErrors({ username: '', password: '', passwordConfirm: '' });
-            }}
-            className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl"
-          >
-            ✕
-          </button>
-          
-          <h2 className="text-2xl font-bold mb-4">회원가입</h2>
-          
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-semibold mb-2 text-gray-800">아이디</label>
-              <input
-                type="text"
-                value={signupData.username}
-                onChange={(e) => setSignupData({...signupData, username: e.target.value})}
-                placeholder="아이디를 입력하세요 (최소 4자)"
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-500 text-sm"
-              />
-              {errors.username && <p className="text-red-500 text-xs mt-1">{errors.username}</p>}
-            </div>
+            <button
+              onClick={() => {
+                setShowSignup(false);
+                setSignupData({ username: '', nickname: '', password: '', passwordConfirm: '' });
+                setErrors({ username: '', nickname: '', password: '', passwordConfirm: '' });
+              }}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl"
+            >
+              ✕
+            </button>
+            
+            <h2 className="text-2xl font-bold mb-4">회원가입</h2>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold mb-2 text-gray-800">아이디</label>
+                <input
+                  type="text"
+                  value={signupData.username}
+                  onChange={(e) => setSignupData({...signupData, username: e.target.value})}
+                  placeholder="아이디를 입력하세요 (최소 4자)"
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-500 text-sm"
+                />
+                {errors.username && <p className="text-red-500 text-xs mt-1">{errors.username}</p>}
+              </div>
 
-            <div>
-              <label className="block text-sm font-semibold mb-2 text-gray-800">비밀번호</label>
+              <div>
+                <label className="block text-sm font-semibold mb-2 text-gray-800">닉네임</label>
+                <input
+                  type="text"
+                  value={signupData.nickname}
+                  onChange={(e) => setSignupData({...signupData, nickname: e.target.value})}
+                  placeholder="닉네임을 입력하세요 (최소 2자)"
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-500 text-sm"
+                />
+                {errors.nickname && <p className="text-red-500 text-xs mt-1">{errors.nickname}</p>}
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold mb-2 text-gray-800">비밀번호</label>
               <input
                 type="password"
                 value={signupData.password}
