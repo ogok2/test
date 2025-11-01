@@ -1454,7 +1454,7 @@ const LivestockPlatform = () => {
                           : [...current, label as string];
                         (q.setValue as any)(newMethods);
                       } else if (q.id === 7) {
-                        const valueKeys = ['local', 'sustainability', 'value4money', 'premium'];
+                        const valueKeys = ['local', 'animalWelfare', 'lowCarbon', 'value4money', 'premium'];
                         const selected = valueKeys.filter(k => surveyData.values[k as keyof typeof surveyData.values]);
                         const newSelected = selected.includes(key)
                           ? selected.filter(k => k !== key)
