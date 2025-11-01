@@ -1935,14 +1935,12 @@ const LivestockPlatform = () => {
                   value={signupData.username}
                   onChange={(e) => {
                     setSignupData({...signupData, username: e.target.value});
-                    // 에러 초기화
-                    if (errors.username) {
-                      setErrors({...errors, username: ''});
-                    }
                   }}
                   onBlur={() => {
                     if (signupData.username.length > 0 && signupData.username.length < 4) {
                       setErrors({...errors, username: '아이디는 최소 4자 이상이어야 합니다.'});
+                    } else {
+                      setErrors({...errors, username: ''});
                     }
                   }}
                   placeholder="아이디를 입력하세요 (최소 4자)"
@@ -1959,14 +1957,12 @@ const LivestockPlatform = () => {
                   value={signupData.nickname}
                   onChange={(e) => {
                     setSignupData({...signupData, nickname: e.target.value});
-                    // 에러 초기화
-                    if (errors.nickname) {
-                      setErrors({...errors, nickname: ''});
-                    }
                   }}
                   onBlur={() => {
                     if (signupData.nickname.length > 0 && signupData.nickname.length < 2) {
                       setErrors({...errors, nickname: '닉네임은 최소 2자 이상이어야 합니다.'});
+                    } else {
+                      setErrors({...errors, nickname: ''});
                     }
                   }}
                   placeholder="닉네임을 입력하세요 (최소 2자)"
@@ -1983,14 +1979,12 @@ const LivestockPlatform = () => {
                   value={signupData.password}
                   onChange={(e) => {
                     setSignupData({...signupData, password: e.target.value});
-                    // 에러 초기화
-                    if (errors.password) {
-                      setErrors({...errors, password: ''});
-                    }
                   }}
                   onBlur={() => {
                     if (signupData.password.length > 0 && signupData.password.length < 6) {
                       setErrors({...errors, password: '비밀번호는 최소 6자 이상이어야 합니다.'});
+                    } else {
+                      setErrors({...errors, password: ''});
                     }
                   }}
                   placeholder="비밀번호를 입력하세요 (최소 6자)"
@@ -2007,14 +2001,12 @@ const LivestockPlatform = () => {
                   value={signupData.passwordConfirm}
                   onChange={(e) => {
                     setSignupData({...signupData, passwordConfirm: e.target.value});
-                    // 에러 초기화
-                    if (errors.passwordConfirm) {
-                      setErrors({...errors, passwordConfirm: ''});
-                    }
                   }}
                   onBlur={() => {
                     if (signupData.passwordConfirm.length > 0 && signupData.password !== signupData.passwordConfirm) {
                       setErrors({...errors, passwordConfirm: '비밀번호가 일치하지 않습니다.'});
+                    } else {
+                      setErrors({...errors, passwordConfirm: ''});
                     }
                   }}
                   placeholder="비밀번호를 다시 입력하세요"
