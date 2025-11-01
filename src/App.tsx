@@ -1780,7 +1780,8 @@ const LivestockPlatform = () => {
         flavor: '',
         fatAmount: ''
       });
-      setActiveTab('home');
+      setSelectedProduct(null); // 선택된 제품 초기화
+      setActiveTab('home'); // 홈 탭으로 이동
     };
 
     return (
