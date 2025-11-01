@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Star, Camera, Gift, TrendingUp, ChefHat, Leaf, Home, User, ShoppingBag, MessageCircle, Heart, MessageSquare, QrCode, Search } from 'lucide-react';
 
 // 타입 정의
@@ -95,6 +95,7 @@ const LivestockPlatform = () => {
     password: '',
     passwordConfirm: ''
   });
+  const [selectedMarketProductFromHome, setSelectedMarketProductFromHome] = useState<Product | null>(null);
 
   // 랜딩 페이지 (초기 화면)
   const LandingPage = () => (
@@ -308,6 +309,16 @@ const LivestockPlatform = () => {
     }
   ];
 
+  // 제품 이미지 가져오기 (breed 기반) - 공통 함수
+  const getProductImage = (product: Product) => {
+    if (product.breed === '한우') {
+      return '/cowcow.jpg';
+    } else if (product.breed === '돼지') {
+      return '/pig.jpg';
+    }
+    return product.image; // 기본값 (이모지)
+  };
+
   const HomePage = () => (
     <div className="space-y-6">
       {/* 고기 정보 카드 */}
@@ -512,11 +523,18 @@ const LivestockPlatform = () => {
           {products.map(product => (
             <div 
               key={product.id}
-              onClick={() => setSelectedProduct(product)}
+              onClick={() => {
+                setSelectedMarketProductFromHome(product);
+                setActiveTab('market');
+              }}
               className="bg-white rounded-xl p-4 border-2 border-gray-100 hover:border-green-300 transition-all cursor-pointer"
             >
               <div className="flex gap-4">
-                <div className="text-5xl">{product.image}</div>
+                <img 
+                  src={getProductImage(product)} 
+                  alt={product.name}
+                  className="w-16 h-16 object-cover rounded-lg flex-shrink-0"
+                />
                 <div className="flex-1">
                   <div className="flex gap-2 mb-1">
                     {product.tags.map((tag, i) => (
