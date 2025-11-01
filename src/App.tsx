@@ -342,7 +342,10 @@ const LivestockPlatform = () => {
         
         {/* 고기 평가하기 버튼 */}
         <button 
-          onClick={() => setActiveTab('evaluate')}
+          onClick={() => {
+            setReceiptStep('scan');
+            setActiveTab('evaluate');
+          }}
           className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold py-3 rounded-xl hover:from-orange-600 hover:to-red-600 transition-colors flex items-center justify-center gap-2"
         >
           <Star size={20} className="fill-white" />
@@ -695,7 +698,10 @@ const LivestockPlatform = () => {
           <h3 className="font-bold text-lg mb-2">✨ 고기이음의 새로운 기능!</h3>
           <p className="text-sm mb-4 opacity-90">기존 이력제 정보 + 소비자 평가 + 포인트 보상</p>
           <button 
-            onClick={() => setActiveTab('evaluate')}
+            onClick={() => {
+              setReceiptStep('scan');
+              setActiveTab('evaluate');
+            }}
             className="w-full bg-white text-green-600 font-bold py-3 rounded-xl hover:bg-gray-50 transition-colors"
           >
             고기 평가하고 2000P 받기 →
@@ -1775,117 +1781,279 @@ const LivestockPlatform = () => {
   };
 
   const EvaluationPage = () => {
-    interface OptionSelectProps {
-      value: string;
-      onChange: (value: string) => void;
-      label: string;
-      options: string[];
-      smallSize?: boolean; // 사이즈 작게 옵션
+    // 영수증 스캔 화면
+    if (receiptStep === 'scan') {
+      return (
+        <div className="space-y-4 pb-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold">영수증 인증하러가기</h2>
+            <button
+              onClick={() => {
+                setActiveTab('home');
+                setReceiptStep('scan');
+              }}
+              className="text-gray-500 text-sm"
+            >
+              ✕
+            </button>
+          </div>
+
+          <div className="bg-gray-900 rounded-xl p-6 min-h-[500px] flex flex-col items-center justify-center relative">
+            {/* 카메라 화면 시뮬레이션 */}
+            <div className="w-full h-full flex flex-col items-center justify-center">
+              {/* 스캔 가이드 프레임 */}
+              <div className="relative w-64 h-80 bg-white/10 rounded-lg border-2 border-green-500 p-4 flex flex-col items-center justify-center">
+                <div className="text-6xl mb-4">🧾</div>
+                <div className="w-full h-1 bg-green-500 animate-pulse"></div>
+              </div>
+
+              {/* 안내 텍스트 */}
+              <div className="mt-8 text-center text-white px-4">
+                <p className="text-sm leading-relaxed">
+                  직접 구매한 영수증의<br />
+                  <span className="font-bold">제품명과 결제정보</span>가<br />
+                  잘 나오게 찍어주세요.
+                </p>
+              </div>
+
+              {/* 인증하러가기 버튼 */}
+              <button
+                onClick={() => setReceiptStep('result')}
+                className="mt-8 bg-gradient-to-r from-blue-500 to-green-500 text-white font-bold py-4 px-8 rounded-xl hover:from-blue-600 hover:to-green-600 transition-all shadow-lg"
+              >
+                인증하러가기
+              </button>
+            </div>
+          </div>
+        </div>
+      );
     }
 
-    const OptionSelect: React.FC<OptionSelectProps> = ({ value, onChange, label, options, smallSize = false }) => (
-      <div className="mb-5">
-        <label className="block font-semibold mb-2 text-gray-800">{label}</label>
-        <div className={`grid gap-2 ${smallSize ? 'grid-cols-3' : 'grid-cols-2'}`}>
-          {options.map(option => (
-            <button
-              key={option}
-              onClick={() => onChange(option)}
-              className={`py-3 px-3 rounded-xl font-medium transition-all active:scale-95 text-sm ${
-                smallSize ? 'text-xs py-2 px-2' : ''
-              } ${
-                value === option
-                  ? 'bg-green-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              {option}
-            </button>
-          ))}
-        </div>
-      </div>
-    );
-
-    const handleSubmit = () => {
-      const { satisfaction, cut, tenderness, flavor, fatAmount } = evaluation;
-      
-      if (!satisfaction || !cut || !tenderness || !flavor || !fatAmount) {
-        alert('모든 항목을 평가해주세요! 😊');
-        return;
+    // 영수증 인식 완료 화면
+    if (receiptStep === 'result') {
+      interface OptionSelectProps {
+        value: string;
+        onChange: (value: string) => void;
+        label: string;
+        options: string[];
+        smallSize?: boolean;
       }
 
-      setUserPoints(prev => prev + 2000);
-      alert('평가 완료! 🎉\n2000포인트가 적립되었습니다!');
-      setEvaluation({
-        satisfaction: '',
-        cut: '',
-        tenderness: '',
-        flavor: '',
-        fatAmount: ''
-      });
-      setSelectedProduct(null); // 선택된 제품 초기화
-      setActiveTab('home'); // 홈 탭으로 이동
-    };
-
-    return (
-      <div className="space-y-4 pb-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold">고기 평가하기</h2>
-          <span className="text-green-600 font-bold">+2000P</span>
+      const OptionSelect: React.FC<OptionSelectProps> = ({ value, onChange, label, options, smallSize = false }) => (
+        <div className="mb-5">
+          <label className="block font-semibold mb-2 text-gray-800">{label}</label>
+          <div className={`grid gap-2 ${smallSize ? 'grid-cols-3' : 'grid-cols-2'}`}>
+            {options.map(option => (
+              <button
+                key={option}
+                onClick={() => onChange(option)}
+                className={`py-3 px-3 rounded-xl font-medium transition-all active:scale-95 text-sm ${
+                  smallSize ? 'text-xs py-2 px-2' : ''
+                } ${
+                  value === option
+                    ? 'bg-green-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
         </div>
+      );
 
-        <div className="bg-amber-50 border-2 border-amber-200 rounded-xl p-4">
-          <p className="text-sm text-gray-700">
-            솔직한 평가가 좋은 축산물을 만듭니다! 😊
-          </p>
+      const handleSubmit = () => {
+        const { satisfaction, cut, tenderness, flavor, fatAmount } = evaluation;
+        
+        if (!satisfaction || !cut || !tenderness || !flavor || !fatAmount) {
+          alert('모든 항목을 평가해주세요! 😊');
+          return;
+        }
+
+        setUserPoints(prev => prev + 2000);
+        alert('평가 완료! 🎉\n2000포인트가 적립되었습니다!');
+        setEvaluation({
+          satisfaction: '',
+          cut: '',
+          tenderness: '',
+          flavor: '',
+          fatAmount: ''
+        });
+        setSelectedProduct(null);
+        setReceiptStep('scan');
+        setActiveTab('home');
+      };
+
+      return (
+        <div className="space-y-4 pb-6">
+          {/* 인식 완료 헤더 */}
+          <div className="bg-black text-white p-4 flex items-center justify-between">
+            <span className="text-sm">10:20</span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs">LTE</span>
+              <span className="text-xs">18</span>
+            </div>
+            <button
+              onClick={() => {
+                setReceiptStep('scan');
+                setEvaluation({
+                  satisfaction: '',
+                  cut: '',
+                  tenderness: '',
+                  flavor: '',
+                  fatAmount: ''
+                });
+              }}
+              className="text-white text-xl"
+            >
+              ✕
+            </button>
+          </div>
+
+          {/* 영수증 인식 결과 */}
+          <div className="bg-white rounded-xl p-5 border-2 border-gray-200">
+            {/* 가맹점 정보 */}
+            <div className="mb-4">
+              <div className="border-2 border-green-500 rounded-lg p-3 mb-2">
+                <div className="font-bold text-lg">마트365 (강남점)</div>
+              </div>
+              <div className="text-2xl font-bold text-right">25,500 원</div>
+            </div>
+
+            {/* 거래 정보 */}
+            <div className="space-y-2 mb-4 pb-4 border-b-2 border-dashed border-gray-300">
+              <div className="flex justify-between">
+                <span className="text-sm text-gray-600">거래번호</span>
+                <span className="text-sm font-semibold">103136562357</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-gray-600">거래일시</span>
+                <div className="border-2 border-green-500 rounded px-2 py-1">
+                  <span className="text-sm font-semibold text-green-600">2025-01-15 14:30</span>
+                </div>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-gray-600">거래상태</span>
+                <span className="text-sm font-semibold">결제완료</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-gray-600">결제방식</span>
+                <span className="text-sm font-semibold">카드결제</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-gray-600">카드정보</span>
+                <div className="border-2 border-green-500 rounded px-2 py-1">
+                  <span className="text-sm font-semibold text-green-600">9440-81**-****-4977</span>
+                </div>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-gray-600">승인번호</span>
+                <div className="border-2 border-green-500 rounded px-2 py-1">
+                  <span className="text-sm font-semibold text-green-600">20637507</span>
+                </div>
+              </div>
+            </div>
+
+            {/* 가맹점 정보 */}
+            <div className="space-y-2 mb-4 pb-4 border-b-2 border-dashed border-gray-300">
+              <div className="flex justify-between">
+                <span className="text-sm text-gray-600">가맹점</span>
+                <div className="border-2 border-green-500 rounded px-2 py-1">
+                  <span className="text-sm font-semibold text-green-600">마트365 (강남점)</span>
+                </div>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-gray-600">사업자등록번호</span>
+                <span className="text-sm font-semibold">558-13-02230</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-gray-600">전화번호</span>
+                <span className="text-sm font-semibold">02-1234-5678</span>
+              </div>
+            </div>
+
+            {/* 구매 상품 목록 */}
+            <div className="space-y-2 mb-4">
+              <div className="text-sm font-semibold mb-2">결제상세내역</div>
+              <div className="space-y-1 text-sm">
+                <div className="flex justify-between">
+                  <span>ㄴ 딸기 (국산)</span>
+                  <span>5,500 원</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>ㄴ 쌀 (백미 10kg)</span>
+                  <span>12,000 원</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>ㄴ 살치살 200g</span>
+                  <span className="font-bold text-green-600">20,000 원</span>
+                </div>
+              </div>
+              <div className="flex justify-between pt-2 border-t border-gray-300 font-bold mt-2">
+                <span>결제금액</span>
+                <span>25,500 원</span>
+              </div>
+            </div>
+
+            {/* 인식 완료 메시지 */}
+            <div className="bg-black text-white p-4 rounded-lg flex items-center justify-center gap-2">
+              <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                <span className="text-white font-bold">✓</span>
+              </div>
+              <span className="font-bold">인식완료!</span>
+            </div>
+          </div>
+
+          {/* 평가 항목 */}
+          <div className="bg-white rounded-xl p-5 border-2 border-gray-100">
+            <OptionSelect
+              label="1. 구매하신 상품은 만족하시나요?"
+              value={evaluation.satisfaction}
+              onChange={(v) => setEvaluation({...evaluation, satisfaction: v})}
+              options={['맛있어요', '보통이에요', '아쉬어워요']}
+            />
+
+            <OptionSelect
+              label="2. 구매한 부위는 무엇인가요?"
+              value={evaluation.cut}
+              onChange={(v) => setEvaluation({...evaluation, cut: v})}
+              options={['등심', '우둔', '목심', '설도', '갈비', '양지', '사태', '앞다리', '채끝', '안심']}
+              smallSize={true}
+            />
+
+            <OptionSelect
+              label="3. 고기는 얼마나 부드러웠나요?"
+              value={evaluation.tenderness}
+              onChange={(v) => setEvaluation({...evaluation, tenderness: v})}
+              options={['부드러워요', '적당해요', '질겨요']}
+            />
+
+            <OptionSelect
+              label="4. 풍미는 어떤가요?"
+              value={evaluation.flavor}
+              onChange={(v) => setEvaluation({...evaluation, flavor: v})}
+              options={['고소해요', '적당해요', '담백해요']}
+            />
+
+            <OptionSelect
+              label="5. 지방량은 어떤가요?"
+              value={evaluation.fatAmount}
+              onChange={(v) => setEvaluation({...evaluation, fatAmount: v})}
+              options={['너무많아요', '많아요', '적당해요', '적어요']}
+            />
+          </div>
+
+          <button
+            onClick={handleSubmit}
+            className="w-full bg-green-600 text-white font-bold py-4 rounded-xl hover:bg-green-700 transition-colors active:bg-green-800"
+          >
+            평가 제출하고 2000P 받기
+          </button>
         </div>
+      );
+    }
 
-        <div className="bg-white rounded-xl p-5 border-2 border-gray-100">
-          <OptionSelect
-            label="1. 구매하신 상품은 만족하시나요?"
-            value={evaluation.satisfaction}
-            onChange={(v) => setEvaluation({...evaluation, satisfaction: v})}
-            options={['맛있어요', '보통이에요', '아쉬어워요']}
-          />
-
-          <OptionSelect
-            label="2. 구매한 부위는 무엇인가요?"
-            value={evaluation.cut}
-            onChange={(v) => setEvaluation({...evaluation, cut: v})}
-            options={['등심', '우둔', '목심', '설도', '갈비', '양지', '사태', '앞다리', '채끝', '안심']}
-            smallSize={true}
-          />
-
-          <OptionSelect
-            label="3. 고기는 얼마나 부드러웠나요?"
-            value={evaluation.tenderness}
-            onChange={(v) => setEvaluation({...evaluation, tenderness: v})}
-            options={['부드러워요', '적당해요', '질겨요']}
-          />
-
-          <OptionSelect
-            label="4. 풍미는 어떤가요?"
-            value={evaluation.flavor}
-            onChange={(v) => setEvaluation({...evaluation, flavor: v})}
-            options={['고소해요', '적당해요', '담백해요']}
-          />
-
-          <OptionSelect
-            label="5. 지방량은 어떤가요?"
-            value={evaluation.fatAmount}
-            onChange={(v) => setEvaluation({...evaluation, fatAmount: v})}
-            options={['너무많아요', '많아요', '적당해요', '적어요']}
-          />
-        </div>
-
-        <button
-          onClick={handleSubmit}
-          className="w-full bg-green-600 text-white font-bold py-4 rounded-xl hover:bg-green-700 transition-colors active:bg-green-800"
-        >
-          평가 제출하고 2000P 받기
-        </button>
-      </div>
-    );
+    return null;
   };
 
   // 회원가입 컴포넌트
