@@ -97,6 +97,7 @@ const LivestockPlatform = () => {
   });
   const [selectedMarketProductFromHome, setSelectedMarketProductFromHome] = useState<Product | null>(null);
   const [receiptStep, setReceiptStep] = useState<'scan' | 'result'>('scan'); // 영수증 인증 단계
+  const [showEvaluation, setShowEvaluation] = useState(false); // 평가 항목 표시 여부
 
   // 랜딩 페이지 (초기 화면)
   const LandingPage = () => (
@@ -344,6 +345,7 @@ const LivestockPlatform = () => {
         <button 
           onClick={() => {
             setReceiptStep('scan');
+            setShowEvaluation(false);
             setActiveTab('evaluate');
           }}
           className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold py-3 rounded-xl hover:from-orange-600 hover:to-red-600 transition-colors flex items-center justify-center gap-2"
@@ -1791,6 +1793,7 @@ const LivestockPlatform = () => {
               onClick={() => {
                 setActiveTab('home');
                 setReceiptStep('scan');
+                setShowEvaluation(false);
               }}
               className="text-gray-500 text-sm"
             >
@@ -1881,41 +1884,18 @@ const LivestockPlatform = () => {
         });
         setSelectedProduct(null);
         setReceiptStep('scan');
+        setShowEvaluation(false);
         setActiveTab('home');
       };
 
       return (
         <div className="space-y-4 pb-6">
-          {/* 인식 완료 헤더 */}
-          <div className="bg-black text-white p-4 flex items-center justify-between">
-            <span className="text-sm">10:20</span>
-            <div className="flex items-center gap-2">
-              <span className="text-xs">LTE</span>
-              <span className="text-xs">18</span>
-            </div>
-            <button
-              onClick={() => {
-                setReceiptStep('scan');
-                setEvaluation({
-                  satisfaction: '',
-                  cut: '',
-                  tenderness: '',
-                  flavor: '',
-                  fatAmount: ''
-                });
-              }}
-              className="text-white text-xl"
-            >
-              ✕
-            </button>
-          </div>
-
           {/* 영수증 인식 결과 */}
           <div className="bg-white rounded-xl p-5 border-2 border-gray-200">
             {/* 가맹점 정보 */}
             <div className="mb-4">
               <div className="border-2 border-green-500 rounded-lg p-3 mb-2">
-                <div className="font-bold text-lg">마트365 (강남점)</div>
+                <div className="font-bold text-lg">농협하나로마트 (온라인몰)</div>
               </div>
               <div className="text-2xl font-bold text-right">25,500 원</div>
             </div>
@@ -1949,7 +1929,7 @@ const LivestockPlatform = () => {
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600">승인번호</span>
                 <div className="border-2 border-green-500 rounded px-2 py-1">
-                  <span className="text-sm font-semibold text-green-600">20637507</span>
+                  <span className="text-sm font-semibold text-green-600">5467897</span>
                 </div>
               </div>
             </div>
@@ -1959,7 +1939,7 @@ const LivestockPlatform = () => {
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600">가맹점</span>
                 <div className="border-2 border-green-500 rounded px-2 py-1">
-                  <span className="text-sm font-semibold text-green-600">마트365 (강남점)</span>
+                  <span className="text-sm font-semibold text-green-600">농협하나로마트 (온라인몰)</span>
                 </div>
               </div>
               <div className="flex justify-between">
@@ -1985,8 +1965,12 @@ const LivestockPlatform = () => {
                   <span>12,000 원</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>ㄴ 살치살 200g</span>
-                  <span className="font-bold text-green-600">20,000 원</span>
+                  <div className="border-2 border-green-500 rounded px-2 py-1">
+                    <span className="font-semibold text-green-600">ㄴ 살치살 200g</span>
+                  </div>
+                  <div className="border-2 border-green-500 rounded px-2 py-1">
+                    <span className="font-bold text-green-600">20,000 원</span>
+                  </div>
                 </div>
               </div>
               <div className="flex justify-between pt-2 border-t border-gray-300 font-bold mt-2">
@@ -1996,59 +1980,68 @@ const LivestockPlatform = () => {
             </div>
 
             {/* 인식 완료 메시지 */}
-            <div className="bg-black text-white p-4 rounded-lg flex items-center justify-center gap-2">
-              <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold">✓</span>
-              </div>
-              <span className="font-bold">인식완료!</span>
-            </div>
+            {!showEvaluation && (
+              <button
+                onClick={() => setShowEvaluation(true)}
+                className="w-full bg-black text-white p-4 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-800 transition-colors"
+              >
+                <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                  <span className="text-white font-bold">✓</span>
+                </div>
+                <span className="font-bold">인식완료!</span>
+              </button>
+            )}
           </div>
 
           {/* 평가 항목 */}
-          <div className="bg-white rounded-xl p-5 border-2 border-gray-100">
-            <OptionSelect
-              label="1. 구매하신 상품은 만족하시나요?"
-              value={evaluation.satisfaction}
-              onChange={(v) => setEvaluation({...evaluation, satisfaction: v})}
-              options={['맛있어요', '보통이에요', '아쉬어워요']}
-            />
+          {showEvaluation && (
+            <>
+              <div className="bg-white rounded-xl p-5 border-2 border-gray-100">
+                <OptionSelect
+                  label="1. 구매하신 상품은 만족하시나요?"
+                  value={evaluation.satisfaction}
+                  onChange={(v) => setEvaluation({...evaluation, satisfaction: v})}
+                  options={['맛있어요', '보통이에요', '아쉬어워요']}
+                />
 
-            <OptionSelect
-              label="2. 구매한 부위는 무엇인가요?"
-              value={evaluation.cut}
-              onChange={(v) => setEvaluation({...evaluation, cut: v})}
-              options={['등심', '우둔', '목심', '설도', '갈비', '양지', '사태', '앞다리', '채끝', '안심']}
-              smallSize={true}
-            />
+                <OptionSelect
+                  label="2. 구매한 부위는 무엇인가요?"
+                  value={evaluation.cut}
+                  onChange={(v) => setEvaluation({...evaluation, cut: v})}
+                  options={['등심', '우둔', '목심', '설도', '갈비', '양지', '사태', '앞다리', '채끝', '안심']}
+                  smallSize={true}
+                />
 
-            <OptionSelect
-              label="3. 고기는 얼마나 부드러웠나요?"
-              value={evaluation.tenderness}
-              onChange={(v) => setEvaluation({...evaluation, tenderness: v})}
-              options={['부드러워요', '적당해요', '질겨요']}
-            />
+                <OptionSelect
+                  label="3. 고기는 얼마나 부드러웠나요?"
+                  value={evaluation.tenderness}
+                  onChange={(v) => setEvaluation({...evaluation, tenderness: v})}
+                  options={['부드러워요', '적당해요', '질겨요']}
+                />
 
-            <OptionSelect
-              label="4. 풍미는 어떤가요?"
-              value={evaluation.flavor}
-              onChange={(v) => setEvaluation({...evaluation, flavor: v})}
-              options={['고소해요', '적당해요', '담백해요']}
-            />
+                <OptionSelect
+                  label="4. 풍미는 어떤가요?"
+                  value={evaluation.flavor}
+                  onChange={(v) => setEvaluation({...evaluation, flavor: v})}
+                  options={['고소해요', '적당해요', '담백해요']}
+                />
 
-            <OptionSelect
-              label="5. 지방량은 어떤가요?"
-              value={evaluation.fatAmount}
-              onChange={(v) => setEvaluation({...evaluation, fatAmount: v})}
-              options={['너무많아요', '많아요', '적당해요', '적어요']}
-            />
-          </div>
+                <OptionSelect
+                  label="5. 지방량은 어떤가요?"
+                  value={evaluation.fatAmount}
+                  onChange={(v) => setEvaluation({...evaluation, fatAmount: v})}
+                  options={['너무많아요', '많아요', '적당해요', '적어요']}
+                />
+              </div>
 
-          <button
-            onClick={handleSubmit}
-            className="w-full bg-green-600 text-white font-bold py-4 rounded-xl hover:bg-green-700 transition-colors active:bg-green-800"
-          >
-            평가 제출하고 2000P 받기
-          </button>
+              <button
+                onClick={handleSubmit}
+                className="w-full bg-green-600 text-white font-bold py-4 rounded-xl hover:bg-green-700 transition-colors active:bg-green-800"
+              >
+                평가 제출하고 2000P 받기
+              </button>
+            </>
+          )}
         </div>
       );
     }
