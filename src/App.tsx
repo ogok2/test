@@ -394,6 +394,7 @@ const LivestockPlatform = () => {
               type="tel"
               inputMode="numeric"
               pattern="[0-9]*"
+              autoComplete="off"
               value={traceNumber}
               onChange={(e) => {
                 const value = e.target.value.replace(/[^0-9]/g, ''); // 숫자만 허용
@@ -1930,8 +1931,20 @@ const LivestockPlatform = () => {
                 <label className="block text-sm font-semibold mb-2 text-gray-800">아이디</label>
                 <input
                   type="text"
+                  autoComplete="off"
                   value={signupData.username}
-                  onChange={(e) => setSignupData({...signupData, username: e.target.value})}
+                  onChange={(e) => {
+                    setSignupData({...signupData, username: e.target.value});
+                    // 에러 초기화
+                    if (errors.username) {
+                      setErrors({...errors, username: ''});
+                    }
+                  }}
+                  onBlur={() => {
+                    if (signupData.username.length > 0 && signupData.username.length < 4) {
+                      setErrors({...errors, username: '아이디는 최소 4자 이상이어야 합니다.'});
+                    }
+                  }}
                   placeholder="아이디를 입력하세요 (최소 4자)"
                   className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-500 text-sm"
                 />
@@ -1942,8 +1955,20 @@ const LivestockPlatform = () => {
                 <label className="block text-sm font-semibold mb-2 text-gray-800">닉네임</label>
                 <input
                   type="text"
+                  autoComplete="off"
                   value={signupData.nickname}
-                  onChange={(e) => setSignupData({...signupData, nickname: e.target.value})}
+                  onChange={(e) => {
+                    setSignupData({...signupData, nickname: e.target.value});
+                    // 에러 초기화
+                    if (errors.nickname) {
+                      setErrors({...errors, nickname: ''});
+                    }
+                  }}
+                  onBlur={() => {
+                    if (signupData.nickname.length > 0 && signupData.nickname.length < 2) {
+                      setErrors({...errors, nickname: '닉네임은 최소 2자 이상이어야 합니다.'});
+                    }
+                  }}
                   placeholder="닉네임을 입력하세요 (최소 2자)"
                   className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-500 text-sm"
                 />
@@ -1952,27 +1977,51 @@ const LivestockPlatform = () => {
 
               <div>
                 <label className="block text-sm font-semibold mb-2 text-gray-800">비밀번호</label>
-              <input
-                type="password"
-                value={signupData.password}
-                onChange={(e) => setSignupData({...signupData, password: e.target.value})}
-                placeholder="비밀번호를 입력하세요 (최소 6자)"
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-500 text-sm"
-              />
-              {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
-            </div>
+                <input
+                  type="password"
+                  autoComplete="new-password"
+                  value={signupData.password}
+                  onChange={(e) => {
+                    setSignupData({...signupData, password: e.target.value});
+                    // 에러 초기화
+                    if (errors.password) {
+                      setErrors({...errors, password: ''});
+                    }
+                  }}
+                  onBlur={() => {
+                    if (signupData.password.length > 0 && signupData.password.length < 6) {
+                      setErrors({...errors, password: '비밀번호는 최소 6자 이상이어야 합니다.'});
+                    }
+                  }}
+                  placeholder="비밀번호를 입력하세요 (최소 6자)"
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-500 text-sm"
+                />
+                {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+              </div>
 
-            <div>
-              <label className="block text-sm font-semibold mb-2 text-gray-800">비밀번호 확인</label>
-              <input
-                type="password"
-                value={signupData.passwordConfirm}
-                onChange={(e) => setSignupData({...signupData, passwordConfirm: e.target.value})}
-                placeholder="비밀번호를 다시 입력하세요"
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-500 text-sm"
-              />
-              {errors.passwordConfirm && <p className="text-red-500 text-xs mt-1">{errors.passwordConfirm}</p>}
-            </div>
+              <div>
+                <label className="block text-sm font-semibold mb-2 text-gray-800">비밀번호 확인</label>
+                <input
+                  type="password"
+                  autoComplete="new-password"
+                  value={signupData.passwordConfirm}
+                  onChange={(e) => {
+                    setSignupData({...signupData, passwordConfirm: e.target.value});
+                    // 에러 초기화
+                    if (errors.passwordConfirm) {
+                      setErrors({...errors, passwordConfirm: ''});
+                    }
+                  }}
+                  onBlur={() => {
+                    if (signupData.passwordConfirm.length > 0 && signupData.password !== signupData.passwordConfirm) {
+                      setErrors({...errors, passwordConfirm: '비밀번호가 일치하지 않습니다.'});
+                    }
+                  }}
+                  placeholder="비밀번호를 다시 입력하세요"
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-500 text-sm"
+                />
+                {errors.passwordConfirm && <p className="text-red-500 text-xs mt-1">{errors.passwordConfirm}</p>}
+              </div>
 
             <button
               onClick={handleSignup}
