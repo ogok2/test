@@ -779,6 +779,14 @@ const LivestockPlatform = () => {
     const [usePoints, setUsePoints] = useState(true);
     const [pointAmount, setPointAmount] = useState(0);
 
+    // 홈에서 선택된 제품이 있으면 자동으로 선택
+    useEffect(() => {
+      if (selectedMarketProductFromHome) {
+        setSelectedMarketProduct(selectedMarketProductFromHome);
+        setSelectedMarketProductFromHome(null); // 초기화
+      }
+    }, [selectedMarketProductFromHome]);
+
     // 제품 이미지 가져오기 (breed 기반)
     const getProductImage = (product: Product) => {
       if (product.breed === '한우') {
