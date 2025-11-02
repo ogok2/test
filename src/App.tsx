@@ -325,6 +325,30 @@ const LivestockPlatform = () => {
 
   const HomePage = () => (
     <div className="space-y-6">
+      {/* 고기이음 소개 배너 */}
+      <div className="bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl p-6 text-white">
+        <div className="text-center mb-3">
+          <h2 className="text-2xl font-bold mb-2">🐂 고기이음</h2>
+          <div className="inline-block bg-white/20 backdrop-blur px-4 py-2 rounded-full text-sm font-semibold mb-3">
+            축산물 이력제의 혁신, 소비자 네트워크형 플랫폼
+          </div>
+        </div>
+        <div className="grid grid-cols-3 gap-3 text-center text-sm">
+          <div className="bg-white/10 backdrop-blur rounded-lg p-3">
+            <div className="text-2xl mb-1">⭐</div>
+            <div className="font-semibold">소비자 평가</div>
+          </div>
+          <div className="bg-white/10 backdrop-blur rounded-lg p-3">
+            <div className="text-2xl mb-1">🎁</div>
+            <div className="font-semibold">포인트 보상</div>
+          </div>
+          <div className="bg-white/10 backdrop-blur rounded-lg p-3">
+            <div className="text-2xl mb-1">🌱</div>
+            <div className="font-semibold">저탄소 인증</div>
+          </div>
+        </div>
+      </div>
+
       {/* 고기 정보 카드 */}
       <div className="bg-white rounded-2xl p-6 border-2 border-gray-200">
         <div className="text-center text-7xl mb-4">🐂</div>
@@ -465,30 +489,6 @@ const LivestockPlatform = () => {
             <button className="flex-1 bg-white/20 backdrop-blur text-white font-semibold py-3 rounded-xl hover:bg-white/30 transition-colors">
               둘러보기
             </button>
-          </div>
-        </div>
-      </div>
-
-      {/* 고기이음 소개 배너 */}
-      <div className="bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl p-6 text-white">
-        <div className="text-center mb-3">
-          <h2 className="text-2xl font-bold mb-2">🐂 고기이음</h2>
-          <div className="inline-block bg-white/20 backdrop-blur px-4 py-2 rounded-full text-sm font-semibold mb-3">
-            축산물 이력제의 혁신, 소비자 네트워크형 플랫폼
-          </div>
-        </div>
-        <div className="grid grid-cols-3 gap-3 text-center text-sm">
-          <div className="bg-white/10 backdrop-blur rounded-lg p-3">
-            <div className="text-2xl mb-1">⭐</div>
-            <div className="font-semibold">소비자 평가</div>
-          </div>
-          <div className="bg-white/10 backdrop-blur rounded-lg p-3">
-            <div className="text-2xl mb-1">🎁</div>
-            <div className="font-semibold">포인트 보상</div>
-          </div>
-          <div className="bg-white/10 backdrop-blur rounded-lg p-3">
-            <div className="text-2xl mb-1">🌱</div>
-            <div className="font-semibold">저탄소 인증</div>
           </div>
         </div>
       </div>
