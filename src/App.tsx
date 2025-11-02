@@ -2464,7 +2464,8 @@ const LivestockPlatform = () => {
           {activeTab === 'home' && selectedProduct && <ProductDetail />}
           {activeTab === 'evaluate' && <EvaluationPage />}
           {activeTab === 'recipe' && <RecipePage />}
-          {activeTab === 'community' && <CommunityPage />}
+          {activeTab === 'community' && !showAdPage && <CommunityPage />}
+          {activeTab === 'community' && showAdPage && <AdPage />}
           {activeTab === 'market' && <MarketPage />}
           {activeTab === 'profile' && <ProfilePage />}
         </div>
