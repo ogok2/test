@@ -230,7 +230,7 @@ const LivestockPlatform = () => {
       title: '한우 등심 스테이크',
       author: '맛집러버',
       likes: 234,
-      image: '🍖',
+      image: '/steak.jpg',
       points: '+50pt'
     },
     {
@@ -238,7 +238,7 @@ const LivestockPlatform = () => {
       title: '돼지고기 김치찌개',
       author: '요리왕',
       likes: 189,
-      image: '🍲',
+      image: '/kim.jpg',
       points: '+50pt'
     }
   ];
@@ -578,7 +578,9 @@ const LivestockPlatform = () => {
         <div className="grid grid-cols-2 gap-3">
           {recipes.map(recipe => (
             <div key={recipe.id} className="bg-white rounded-xl overflow-hidden border-2 border-gray-100">
-              <div className="text-6xl p-4 bg-gray-50 text-center">{recipe.image}</div>
+              <div className="p-4 bg-gray-50 text-center h-32 flex items-center justify-center overflow-hidden rounded-lg">
+                <img src={recipe.image} alt={recipe.title} className="w-full h-full object-cover" />
+              </div>
               <div className="p-3">
                 <h4 className="font-semibold text-sm mb-1">{recipe.title}</h4>
                 <div className="flex items-center justify-between text-xs text-gray-500">
@@ -769,7 +771,9 @@ const LivestockPlatform = () => {
         {recipes.map(recipe => (
           <div key={recipe.id} className="bg-white rounded-xl p-4 border-2 border-gray-100">
             <div className="flex gap-4">
-              <div className="text-5xl">{recipe.image}</div>
+              <div className="h-32 overflow-hidden rounded-lg">
+                <img src={recipe.image} alt={recipe.title} className="w-full h-full object-cover" />
+              </div>
               <div className="flex-1">
                 <h3 className="font-bold mb-1">{recipe.title}</h3>
                 <p className="text-sm text-gray-500 mb-2">by {recipe.author}</p>
