@@ -1968,7 +1968,7 @@ const LivestockPlatform = () => {
                 </div>
                 <div className="flex justify-between">
                   <div className="border-2 border-green-500 rounded px-2 py-1">
-                    <span className="font-semibold text-green-600">ㄴ 살치살 200g</span>
+                    <span className="font-semibold text-green-600">ㄴ 한우 살치살 구이용</span>
                   </div>
                   <div className="border-2 border-green-500 rounded px-2 py-1">
                     <span className="font-bold text-green-600">20,000 원</span>
