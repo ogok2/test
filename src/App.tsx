@@ -2274,13 +2274,19 @@ const LivestockPlatform = () => {
                   autoComplete="off"
                   value={signupData.username}
                   onChange={(e) => {
-                    setSignupData({...signupData, username: e.target.value});
+                    const value = e.target.value;
+                    setSignupData(prev => ({...prev, username: value}));
+                    // 에러 초기화
+                    if (errors.username && value.length >= 4) {
+                      setErrors(prev => ({...prev, username: ''}));
+                    }
                   }}
-                  onBlur={() => {
-                    if (signupData.username.length > 0 && signupData.username.length < 4) {
-                      setErrors({...errors, username: '아이디는 최소 4자 이상이어야 합니다.'});
+                  onBlur={(e) => {
+                    const value = e.target.value;
+                    if (value.length > 0 && value.length < 4) {
+                      setErrors(prev => ({...prev, username: '아이디는 최소 4자 이상이어야 합니다.'}));
                     } else {
-                      setErrors({...errors, username: ''});
+                      setErrors(prev => ({...prev, username: ''}));
                     }
                   }}
                   placeholder="아이디를 입력하세요 (최소 4자)"
@@ -2296,13 +2302,19 @@ const LivestockPlatform = () => {
                   autoComplete="off"
                   value={signupData.nickname}
                   onChange={(e) => {
-                    setSignupData({...signupData, nickname: e.target.value});
+                    const value = e.target.value;
+                    setSignupData(prev => ({...prev, nickname: value}));
+                    // 에러 초기화
+                    if (errors.nickname && value.length >= 2) {
+                      setErrors(prev => ({...prev, nickname: ''}));
+                    }
                   }}
-                  onBlur={() => {
-                    if (signupData.nickname.length > 0 && signupData.nickname.length < 2) {
-                      setErrors({...errors, nickname: '닉네임은 최소 2자 이상이어야 합니다.'});
+                  onBlur={(e) => {
+                    const value = e.target.value;
+                    if (value.length > 0 && value.length < 2) {
+                      setErrors(prev => ({...prev, nickname: '닉네임은 최소 2자 이상이어야 합니다.'}));
                     } else {
-                      setErrors({...errors, nickname: ''});
+                      setErrors(prev => ({...prev, nickname: ''}));
                     }
                   }}
                   placeholder="닉네임을 입력하세요 (최소 2자)"
@@ -2318,13 +2330,27 @@ const LivestockPlatform = () => {
                   autoComplete="new-password"
                   value={signupData.password}
                   onChange={(e) => {
-                    setSignupData({...signupData, password: e.target.value});
+                    const value = e.target.value;
+                    setSignupData(prev => ({...prev, password: value}));
+                    // 에러 초기화
+                    if (errors.password && value.length >= 6) {
+                      setErrors(prev => ({...prev, password: ''}));
+                    }
+                    // 비밀번호 확인 에러도 초기화
+                    if (errors.passwordConfirm && value === signupData.passwordConfirm) {
+                      setErrors(prev => ({...prev, passwordConfirm: ''}));
+                    }
                   }}
-                  onBlur={() => {
-                    if (signupData.password.length > 0 && signupData.password.length < 6) {
-                      setErrors({...errors, password: '비밀번호는 최소 6자 이상이어야 합니다.'});
+                  onBlur={(e) => {
+                    const value = e.target.value;
+                    if (value.length > 0 && value.length < 6) {
+                      setErrors(prev => ({...prev, password: '비밀번호는 최소 6자 이상이어야 합니다.'}));
                     } else {
-                      setErrors({...errors, password: ''});
+                      setErrors(prev => ({...prev, password: ''}));
+                    }
+                    // 비밀번호 확인 체크
+                    if (value !== signupData.passwordConfirm && signupData.passwordConfirm.length > 0) {
+                      setErrors(prev => ({...prev, passwordConfirm: '비밀번호가 일치하지 않습니다.'}));
                     }
                   }}
                   placeholder="비밀번호를 입력하세요 (최소 6자)"
