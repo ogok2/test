@@ -583,6 +583,11 @@ const LivestockPlatform = () => {
                   src={recipe.image} 
                   alt={recipe.title} 
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    console.error('Failed to load image:', recipe.image);
+                    const target = e.target as HTMLImageElement;
+                    target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect width="200" height="200" fill="%23ddd"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%23999"%3E이미지 없음%3C/text%3E%3C/svg%3E';
+                  }}
                 />
               </div>
               <div className="p-3">
@@ -780,6 +785,11 @@ const LivestockPlatform = () => {
                   src={recipe.image} 
                   alt={recipe.title} 
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    console.error('Failed to load image:', recipe.image);
+                    const target = e.target as HTMLImageElement;
+                    target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect width="200" height="200" fill="%23ddd"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%23999"%3E이미지 없음%3C/text%3E%3C/svg%3E';
+                  }}
                 />
               </div>
               <div className="flex-1">
