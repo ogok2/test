@@ -1120,8 +1120,9 @@ const LivestockPlatform = () => {
               <button 
                 onClick={() => {
                   // 새 창/탭에서 열기
-                  const imageUrl = window.location.origin + '/fi.jpg';
-                  const newWindow = window.open('', '_blank', 'width=600,height=800');
+                  const baseUrl = window.location.origin;
+                  const imageUrl = baseUrl + '/fi.jpg';
+                  const newWindow = window.open('', '_blank', 'width=600,height=900');
                   if (newWindow) {
                     newWindow.document.write(`
                       <!DOCTYPE html>
@@ -1153,6 +1154,7 @@ const LivestockPlatform = () => {
                             }
                             .image-container {
                               margin-bottom: 40px;
+                              width: 100%;
                             }
                             .image-container img {
                               width: 100%;
@@ -1160,9 +1162,12 @@ const LivestockPlatform = () => {
                               height: auto;
                               border-radius: 16px;
                               object-fit: cover;
+                              display: block;
+                              margin: 0 auto;
                             }
                             .message {
-                              line-height: 2;
+                              line-height: 2.5;
+                              margin-top: 20px;
                             }
                             .message-text {
                               font-size: 32px;
@@ -1186,7 +1191,7 @@ const LivestockPlatform = () => {
                         <body>
                           <div class="container">
                             <div class="image-container">
-                              <img src="${imageUrl}" alt="고기이음" onerror="this.style.display='none';" />
+                              <img src="${imageUrl}" alt="고기이음" onerror="alert('이미지를 불러올 수 없습니다: ' + this.src); this.src='data:image/svg+xml,%3Csvg xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"400\\" height=\\"300\\"%3E%3Crect width=\\"400\\" height=\\"300\\" fill=\\"%23ddd\\"/%3E%3Ctext x=\\"50%25\\" y=\\"50%25\\" text-anchor=\\"middle\\" dy=\\".3em\\" fill=\\"%23999\\"%3E이미지 없음%3C/text%3E%3C/svg%3E';" />
                             </div>
                             <div class="message">
                               <div class="message-text">
@@ -1313,6 +1318,10 @@ const LivestockPlatform = () => {
               src="/fi.jpg" 
               alt="고기이음" 
               className="w-full max-w-md mx-auto rounded-2xl object-cover"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+              }}
             />
           </div>
 
