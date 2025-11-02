@@ -1155,13 +1155,16 @@ const LivestockPlatform = () => {
                             .image-container {
                               margin-bottom: 40px;
                               width: 100%;
+                              display: flex;
+                              justify-content: center;
+                              align-items: center;
                             }
                             .image-container img {
                               width: 100%;
                               max-width: 500px;
                               height: auto;
                               border-radius: 16px;
-                              object-fit: cover;
+                              object-fit: contain;
                               display: block;
                               margin: 0 auto;
                             }
