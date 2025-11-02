@@ -1206,6 +1206,38 @@ const LivestockPlatform = () => {
     );
   };
 
+  // 광고 페이지 컴포넌트
+  const AdPage = () => {
+    return (
+      <div className="space-y-4 pb-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold">삼성 비스포크 냉장고</h2>
+          <button
+            onClick={() => setShowAdPage(false)}
+            className="text-gray-500 text-2xl hover:text-gray-700"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div className="bg-gradient-to-r from-slate-800 to-slate-600 rounded-2xl p-8 text-white text-center">
+          <div className="text-7xl mb-6">❄️</div>
+          <h3 className="text-3xl font-bold mb-4">삼성 비스포크 냉장고</h3>
+          <p className="text-lg opacity-90 mb-8">고기 신선하게 보관하세요</p>
+        </div>
+
+        <div className="bg-white rounded-2xl p-8 border-2 border-gray-200 text-center">
+          <div className="text-4xl font-bold text-green-600 mb-4">
+            축산물품질평가원 고기이음팀 화이팅!
+          </div>
+          <p className="text-gray-600 text-lg">
+            고품질 축산물과 함께하는 건강한 식생활
+          </p>
+        </div>
+      </div>
+    );
+  };
+
   // 글쓰기 모달 컴포넌트
   const WritePostModal = () => {
     const [newPost, setNewPost] = useState({
