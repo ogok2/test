@@ -131,8 +131,8 @@ const LivestockPlatform = () => {
             <div className="pt-4 border-t border-gray-200">
               <div className="text-xs text-gray-500 mb-2 font-semibold tracking-wider uppercase">기본 정보</div>
               <p className="text-sm text-gray-700 leading-relaxed">
-                이 고기는 <span className="font-bold text-green-600">2024년 10월</span>에 도축된 
-                <span className="font-bold text-green-600">28개월령</span> 
+                이 고기는 <span className="font-bold text-green-600">2024년 10월</span>에 도축된  
+                <span className="font-bold text-green-600"> 28개월령</span> 
                 <span className="font-bold text-green-600"> 1++등급 한우</span>입니다.
                 <br />
                 <span className="inline-block mt-3 px-4 py-1.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full text-xs font-bold shadow-md">
@@ -758,8 +758,8 @@ const LivestockPlatform = () => {
         <div className="space-y-2">
           {[
             { title: '한우 등심 스테이크 완벽 가이드', author: '셰프김', likes: 892, points: '20,000P 수상' },
-            { title: '돼지고기 김치찌개 황금레시피', author: '요리왕', likes: 756, points: '20,000P 수상' },
-            { title: '저탄소 한우로 만든 소불고기', author: '착한요리사', likes: 634, points: '20,000P 수상' }
+            { title: '돼지고기 김치찌개 황금레시피', author: '요리왕', likes: 756, points: '15,000P 수상' },
+            { title: '저탄소 한우로 만든 소불고기', author: '착한요리사', likes: 634, points: '10,000P 수상' }
           ].map((recipe, i) => (
             <div key={i} className="bg-white rounded-lg p-3">
               <div className="flex items-center justify-between mb-1">
