@@ -1120,6 +1120,7 @@ const LivestockPlatform = () => {
               <button 
                 onClick={() => {
                   // 새 창/탭에서 열기
+                  const imageUrl = window.location.origin + '/fi.jpg';
                   const newWindow = window.open('', '_blank', 'width=600,height=800');
                   if (newWindow) {
                     newWindow.document.write(`
@@ -1128,19 +1129,18 @@ const LivestockPlatform = () => {
                         <head>
                           <meta charset="UTF-8">
                           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                          <title>삼성 비스포크 냉장고</title>
+                          <title>고기이음</title>
                           <style>
                             * { margin: 0; padding: 0; box-sizing: border-box; }
                             body {
                               font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                              background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
+                              background: #f5f5f5;
                               min-height: 100vh;
                               display: flex;
                               flex-direction: column;
                               align-items: center;
                               justify-content: center;
                               padding: 20px;
-                              color: white;
                             }
                             .container {
                               max-width: 600px;
@@ -1149,37 +1149,28 @@ const LivestockPlatform = () => {
                               border-radius: 24px;
                               padding: 40px;
                               text-align: center;
-                              box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                              box-shadow: 0 20px 60px rgba(0,0,0,0.1);
                             }
-                            .header {
-                              background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
+                            .image-container {
+                              margin-bottom: 40px;
+                            }
+                            .image-container img {
+                              width: 100%;
+                              max-width: 500px;
+                              height: auto;
                               border-radius: 16px;
-                              padding: 40px;
-                              margin-bottom: 30px;
-                              color: white;
+                              object-fit: cover;
                             }
-                            .icon { font-size: 80px; margin-bottom: 20px; }
-                            h1 { font-size: 32px; margin-bottom: 10px; }
-                            .subtitle { font-size: 18px; opacity: 0.9; }
                             .message {
-                              background: #f0fdf4;
-                              border: 2px solid #22c55e;
-                              border-radius: 16px;
-                              padding: 30px;
-                              margin-top: 30px;
+                              line-height: 2;
                             }
                             .message-text {
-                              font-size: 28px;
+                              font-size: 32px;
                               font-weight: bold;
                               color: #22c55e;
-                              margin-bottom: 10px;
-                            }
-                            .message-sub {
-                              color: #666;
-                              font-size: 18px;
                             }
                             .close-btn {
-                              margin-top: 30px;
+                              margin-top: 40px;
                               padding: 12px 30px;
                               background: #1e293b;
                               color: white;
@@ -1194,14 +1185,15 @@ const LivestockPlatform = () => {
                         </head>
                         <body>
                           <div class="container">
-                            <div class="header">
-                              <div class="icon">❄️</div>
-                              <h1>삼성 비스포크 냉장고</h1>
-                              <p class="subtitle">고기 신선하게 보관하세요</p>
+                            <div class="image-container">
+                              <img src="${imageUrl}" alt="고기이음" onerror="this.style.display='none';" />
                             </div>
                             <div class="message">
-                              <div class="message-text">축산물품질평가원 고기이음팀 화이팅!</div>
-                              <div class="message-sub">고품질 축산물과 함께하는 건강한 식생활</div>
+                              <div class="message-text">
+                                축산물품질평가원<br />
+                                고기이음팀<br />
+                                화이팅!
+                              </div>
                             </div>
                             <button class="close-btn" onclick="window.close()">닫기</button>
                           </div>
@@ -1306,7 +1298,7 @@ const LivestockPlatform = () => {
     return (
       <div className="space-y-4 pb-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold">삼성 비스포크 냉장고</h2>
+          <h2 className="text-2xl font-bold">광고</h2>
           <button
             onClick={() => setShowAdPage(false)}
             className="text-gray-500 text-2xl hover:text-gray-700"
@@ -1315,19 +1307,22 @@ const LivestockPlatform = () => {
           </button>
         </div>
 
-        <div className="bg-gradient-to-r from-slate-800 to-slate-600 rounded-2xl p-8 text-white text-center">
-          <div className="text-7xl mb-6">❄️</div>
-          <h3 className="text-3xl font-bold mb-4">삼성 비스포크 냉장고</h3>
-          <p className="text-lg opacity-90 mb-8">고기 신선하게 보관하세요</p>
-        </div>
-
-        <div className="bg-white rounded-2xl p-8 border-2 border-gray-200 text-center">
-          <div className="text-4xl font-bold text-green-600 mb-4">
-            축산물품질평가원 고기이음팀 화이팅!
+        <div className="bg-white rounded-2xl p-8 border-2 border-gray-200">
+          <div className="mb-8">
+            <img 
+              src="/fi.jpg" 
+              alt="고기이음" 
+              className="w-full max-w-md mx-auto rounded-2xl object-cover"
+            />
           </div>
-          <p className="text-gray-600 text-lg">
-            고품질 축산물과 함께하는 건강한 식생활
-          </p>
+
+          <div className="text-center">
+            <div className="text-4xl font-bold text-green-600 leading-relaxed">
+              축산물품질평가원<br />
+              고기이음팀<br />
+              화이팅!
+            </div>
+          </div>
         </div>
       </div>
     );
