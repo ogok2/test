@@ -1118,7 +1118,102 @@ const LivestockPlatform = () => {
               <h3 className="font-bold text-lg mb-1">삼성 비스포크 냉장고</h3>
               <p className="text-sm opacity-90 mb-2">고기 신선하게 보관하세요</p>
               <button 
-                onClick={() => setShowAdPage(true)}
+                onClick={() => {
+                  // 새 창/탭에서 열기
+                  const newWindow = window.open('', '_blank', 'width=600,height=800');
+                  if (newWindow) {
+                    newWindow.document.write(`
+                      <!DOCTYPE html>
+                      <html lang="ko">
+                        <head>
+                          <meta charset="UTF-8">
+                          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                          <title>삼성 비스포크 냉장고</title>
+                          <style>
+                            * { margin: 0; padding: 0; box-sizing: border-box; }
+                            body {
+                              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                              background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
+                              min-height: 100vh;
+                              display: flex;
+                              flex-direction: column;
+                              align-items: center;
+                              justify-content: center;
+                              padding: 20px;
+                              color: white;
+                            }
+                            .container {
+                              max-width: 600px;
+                              width: 100%;
+                              background: white;
+                              border-radius: 24px;
+                              padding: 40px;
+                              text-align: center;
+                              box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                            }
+                            .header {
+                              background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
+                              border-radius: 16px;
+                              padding: 40px;
+                              margin-bottom: 30px;
+                              color: white;
+                            }
+                            .icon { font-size: 80px; margin-bottom: 20px; }
+                            h1 { font-size: 32px; margin-bottom: 10px; }
+                            .subtitle { font-size: 18px; opacity: 0.9; }
+                            .message {
+                              background: #f0fdf4;
+                              border: 2px solid #22c55e;
+                              border-radius: 16px;
+                              padding: 30px;
+                              margin-top: 30px;
+                            }
+                            .message-text {
+                              font-size: 28px;
+                              font-weight: bold;
+                              color: #22c55e;
+                              margin-bottom: 10px;
+                            }
+                            .message-sub {
+                              color: #666;
+                              font-size: 18px;
+                            }
+                            .close-btn {
+                              margin-top: 30px;
+                              padding: 12px 30px;
+                              background: #1e293b;
+                              color: white;
+                              border: none;
+                              border-radius: 12px;
+                              font-size: 16px;
+                              font-weight: bold;
+                              cursor: pointer;
+                            }
+                            .close-btn:hover { background: #334155; }
+                          </style>
+                        </head>
+                        <body>
+                          <div class="container">
+                            <div class="header">
+                              <div class="icon">❄️</div>
+                              <h1>삼성 비스포크 냉장고</h1>
+                              <p class="subtitle">고기 신선하게 보관하세요</p>
+                            </div>
+                            <div class="message">
+                              <div class="message-text">축산물품질평가원 고기이음팀 화이팅!</div>
+                              <div class="message-sub">고품질 축산물과 함께하는 건강한 식생활</div>
+                            </div>
+                            <button class="close-btn" onclick="window.close()">닫기</button>
+                          </div>
+                        </body>
+                      </html>
+                    `);
+                    newWindow.document.close();
+                  } else {
+                    // 팝업 차단된 경우 대체 방법
+                    setShowAdPage(true);
+                  }
+                }}
                 className="bg-white text-slate-800 px-4 py-2 rounded-lg text-sm font-bold hover:bg-gray-100 transition-colors"
               >
                 자세히 보기 →
