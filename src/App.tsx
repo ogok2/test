@@ -88,6 +88,7 @@ const LivestockPlatform = () => {
     fatAmount: '' // 지방량은 어떤가요?
   });
   const [communityCategory, setCommunityCategory] = useState('all');
+  const [showWritePost, setShowWritePost] = useState(false);
   const [showSignup, setShowSignup] = useState(false);
   const [signupData, setSignupData] = useState({
     username: '',
@@ -244,7 +245,7 @@ const LivestockPlatform = () => {
     }
   ];
 
-  const communityPosts: CommunityPost[] = [
+  const [communityPosts, setCommunityPosts] = useState<CommunityPost[]>([
     {
       id: 1,
       category: 'review',
@@ -310,7 +311,7 @@ const LivestockPlatform = () => {
       isHot: false,
       time: '3시간 전'
     }
-  ];
+  ]);
 
   // 제품 이미지 가져오기 (breed 기반) - 공통 함수
   const getProductImage = (product: Product) => {
@@ -1096,7 +1097,10 @@ const LivestockPlatform = () => {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold">커뮤니티</h2>
-          <button className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2">
+          <button 
+            onClick={() => setShowWritePost(true)}
+            className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-green-700 transition-colors"
+          >
             <Camera size={16} />
             글쓰기
           </button>
@@ -1193,6 +1197,126 @@ const LivestockPlatform = () => {
               </div>
             </div>
           ))}
+        </div>
+      </div>
+    );
+  };
+
+  // 글쓰기 모달 컴포넌트
+  const WritePostModal = () => {
+    const [newPost, setNewPost] = useState({
+      title: '',
+      content: '',
+      category: 'free'
+    });
+
+    const categories = [
+      { id: 'review', label: '후기', icon: '🥩' },
+      { id: 'farm', label: '농가', icon: '👨‍🌾' },
+      { id: 'challenge', label: '챌린지', icon: '🌱' },
+      { id: 'tip', label: '꿀팁', icon: '💡' },
+      { id: 'free', label: '자유', icon: '💬' }
+    ];
+
+    const handleSubmit = () => {
+      if (!newPost.title.trim() || !newPost.content.trim()) {
+        alert('제목과 내용을 입력해주세요!');
+        return;
+      }
+
+      const post: CommunityPost = {
+        id: Math.max(...communityPosts.map(p => p.id), 0) + 1,
+        category: newPost.category,
+        title: newPost.title,
+        author: signupData.nickname || '익명',
+        content: newPost.content,
+        image: '📝',
+        likes: 0,
+        comments: 0,
+        tags: [],
+        isHot: false,
+        time: '방금 전'
+      };
+
+      setCommunityPosts([post, ...communityPosts]);
+      setNewPost({ title: '', content: '', category: 'free' });
+      setShowWritePost(false);
+      setCommunityCategory('all'); // 전체 카테고리로 변경
+      alert('글이 작성되었습니다!');
+    };
+
+    return (
+      <div className="fixed inset-0 bg-black/50 z-[200] flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+          <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex items-center justify-between">
+            <h3 className="text-xl font-bold">글쓰기</h3>
+            <button
+              onClick={() => setShowWritePost(false)}
+              className="text-gray-500 text-2xl hover:text-gray-700"
+            >
+              ×
+            </button>
+          </div>
+
+          <div className="p-4 space-y-4">
+            {/* 카테고리 선택 */}
+            <div>
+              <label className="block text-sm font-semibold mb-2 text-gray-800">카테고리</label>
+              <div className="grid grid-cols-5 gap-2">
+                {categories.map(cat => (
+                  <button
+                    key={cat.id}
+                    onClick={() => setNewPost({...newPost, category: cat.id})}
+                    className={`py-2 px-2 rounded-lg text-sm font-medium transition-colors ${
+                      newPost.category === cat.id
+                        ? 'bg-green-600 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    <div className="text-lg">{cat.icon}</div>
+                    <div className="text-xs mt-1">{cat.label}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 제목 */}
+            <div>
+              <label className="block text-sm font-semibold mb-2 text-gray-800">제목</label>
+              <input
+                type="text"
+                value={newPost.title}
+                onChange={(e) => setNewPost({...newPost, title: e.target.value})}
+                placeholder="제목을 입력하세요"
+                className="w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none"
+                maxLength={50}
+              />
+            </div>
+
+            {/* 내용 */}
+            <div>
+              <label className="block text-sm font-semibold mb-2 text-gray-800">내용</label>
+              <textarea
+                value={newPost.content}
+                onChange={(e) => setNewPost({...newPost, content: e.target.value})}
+                placeholder="내용을 입력하세요"
+                rows={8}
+                className="w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none resize-none"
+                maxLength={500}
+              />
+              <div className="text-xs text-gray-500 text-right mt-1">
+                {newPost.content.length}/500
+              </div>
+            </div>
+
+            {/* 작성 버튼 */}
+            <button
+              onClick={handleSubmit}
+              className="w-full bg-green-600 text-white font-bold py-3 rounded-xl hover:bg-green-700 transition-colors"
+            >
+              작성하기
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -2280,6 +2404,7 @@ const LivestockPlatform = () => {
 
       {/* 회원가입 모달 */}
       {showSignup && <SignupModal />}
+      {showWritePost && <WritePostModal />}
 
       {/* 하단 네비게이션 - 화면 하단에 완전 고정 */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-100 z-[100] shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
