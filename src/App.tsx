@@ -2366,13 +2366,19 @@ const LivestockPlatform = () => {
                   autoComplete="new-password"
                   value={signupData.passwordConfirm}
                   onChange={(e) => {
-                    setSignupData({...signupData, passwordConfirm: e.target.value});
+                    const value = e.target.value;
+                    setSignupData(prev => ({...prev, passwordConfirm: value}));
+                    // 에러 초기화
+                    if (errors.passwordConfirm && value === signupData.password) {
+                      setErrors(prev => ({...prev, passwordConfirm: ''}));
+                    }
                   }}
-                  onBlur={() => {
-                    if (signupData.passwordConfirm.length > 0 && signupData.password !== signupData.passwordConfirm) {
-                      setErrors({...errors, passwordConfirm: '비밀번호가 일치하지 않습니다.'});
+                  onBlur={(e) => {
+                    const value = e.target.value;
+                    if (value !== signupData.password) {
+                      setErrors(prev => ({...prev, passwordConfirm: '비밀번호가 일치하지 않습니다.'}));
                     } else {
-                      setErrors({...errors, passwordConfirm: ''});
+                      setErrors(prev => ({...prev, passwordConfirm: ''}));
                     }
                   }}
                   placeholder="비밀번호를 다시 입력하세요"
