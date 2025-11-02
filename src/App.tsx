@@ -1191,7 +1191,7 @@ const LivestockPlatform = () => {
                         <body>
                           <div class="container">
                             <div class="image-container">
-                              <img src="${imageUrl}" alt="고기이음" onerror="alert('이미지를 불러올 수 없습니다: ' + this.src); this.src='data:image/svg+xml,%3Csvg xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"400\\" height=\\"300\\"%3E%3Crect width=\\"400\\" height=\\"300\\" fill=\\"%23ddd\\"/%3E%3Ctext x=\\"50%25\\" y=\\"50%25\\" text-anchor=\\"middle\\" dy=\\".3em\\" fill=\\"%23999\\"%3E이미지 없음%3C/text%3E%3C/svg%3E';" />
+                              <img src="${imageUrl}" alt="고기이음" style="max-width: 100%; height: auto; border-radius: 16px;" />
                             </div>
                             <div class="message">
                               <div class="message-text">
