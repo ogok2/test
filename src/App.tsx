@@ -578,8 +578,12 @@ const LivestockPlatform = () => {
         <div className="grid grid-cols-2 gap-3">
           {recipes.map(recipe => (
             <div key={recipe.id} className="bg-white rounded-xl overflow-hidden border-2 border-gray-100">
-              <div className="p-4 bg-gray-50 text-center h-32 flex items-center justify-center overflow-hidden rounded-lg">
-                <img src={recipe.image} alt={recipe.title} className="w-full h-full object-cover" />
+              <div className="h-32 bg-gray-50 overflow-hidden rounded-lg">
+                <img 
+                  src={recipe.image} 
+                  alt={recipe.title} 
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div className="p-3">
                 <h4 className="font-semibold text-sm mb-1">{recipe.title}</h4>
@@ -771,8 +775,12 @@ const LivestockPlatform = () => {
         {recipes.map(recipe => (
           <div key={recipe.id} className="bg-white rounded-xl p-4 border-2 border-gray-100">
             <div className="flex gap-4">
-              <div className="h-32 overflow-hidden rounded-lg">
-                <img src={recipe.image} alt={recipe.title} className="w-full h-full object-cover" />
+              <div className="h-32 w-32 overflow-hidden rounded-lg flex-shrink-0 bg-gray-50">
+                <img 
+                  src={recipe.image} 
+                  alt={recipe.title} 
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div className="flex-1">
                 <h3 className="font-bold mb-1">{recipe.title}</h3>
