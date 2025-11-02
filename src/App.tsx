@@ -869,7 +869,7 @@ const LivestockPlatform = () => {
             <div className="bg-gray-50 rounded-lg p-4 mb-4">
               <h3 className="font-bold mb-2 text-gray-800">상품 설명</h3>
               <p className="text-sm text-gray-700 leading-relaxed mb-3">
-                {selectedMarketProduct.name}은 {selectedMarketProduct.farmer}에서 정성껏 키운 
+                {selectedMarketProduct.name}은 {selectedMarketProduct.farmer}정성껏 키운 
                 <span className="font-bold text-green-600"> 저탄소 인증 축산물</span>입니다.
                 {selectedMarketProduct.breed === '한우' ? ' 한우의 최고 등급으로, 부드럽고 고소한 맛이 일품입니다.' : 
                  ' 동물복지 인증을 받은 건강한 돼지고기로 풍부한 맛을 느낄 수 있습니다.'}
