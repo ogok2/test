@@ -99,6 +99,7 @@ const LivestockPlatform = () => {
   const [selectedMarketProductFromHome, setSelectedMarketProductFromHome] = useState<Product | null>(null);
   const [receiptStep, setReceiptStep] = useState<'scan' | 'result'>('scan'); // 영수증 인증 단계
   const [showEvaluation, setShowEvaluation] = useState(false); // 평가 항목 표시 여부
+  const [showAdPage, setShowAdPage] = useState(false); // 광고 페이지 표시 여부
 
   // 랜딩 페이지 (초기 화면)
   const LandingPage = () => (
@@ -1116,7 +1117,10 @@ const LivestockPlatform = () => {
             <div className="flex-1">
               <h3 className="font-bold text-lg mb-1">삼성 비스포크 냉장고</h3>
               <p className="text-sm opacity-90 mb-2">고기 신선하게 보관하세요</p>
-              <button className="bg-white text-slate-800 px-4 py-2 rounded-lg text-sm font-bold hover:bg-gray-100 transition-colors">
+              <button 
+                onClick={() => setShowAdPage(true)}
+                className="bg-white text-slate-800 px-4 py-2 rounded-lg text-sm font-bold hover:bg-gray-100 transition-colors"
+              >
                 자세히 보기 →
               </button>
             </div>
