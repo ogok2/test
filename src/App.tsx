@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Star, Camera, Gift, TrendingUp, ChefHat, Leaf, Home, User, ShoppingBag, MessageCircle, Heart, MessageSquare, QrCode, Search } from 'lucide-react';
 
 // 타입 정의
@@ -70,6 +70,7 @@ const LivestockPlatform = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [userPoints, setUserPoints] = useState(1250);
   const [traceNumber, setTraceNumber] = useState(''); // 이력번호 입력
+  const traceNumberInputRef = useRef<HTMLInputElement>(null); // 이력번호 입력 필드 참조
   const [simpleInquiry, setSimpleInquiry] = useState(false); // 간편조회 토글
   const [showPreferenceSurvey, setShowPreferenceSurvey] = useState(false); // 선호도 설문 표시
   const [userPreference, setUserPreference] = useState({
@@ -436,14 +437,33 @@ const LivestockPlatform = () => {
           </div>
           <div className="relative">
             <input
+              ref={traceNumberInputRef}
               type="tel"
               inputMode="numeric"
               pattern="[0-9]*"
               autoComplete="off"
               value={traceNumber}
               onChange={(e) => {
-                const value = e.target.value.replace(/[^0-9]/g, ''); // 숫자만 허용
-                setTraceNumber(value);
+                const input = e.target as HTMLInputElement;
+                const inputValue = input.value;
+                const numericValue = inputValue.replace(/[^0-9]/g, ''); // 숫자만 허용
+                
+                // 현재 커서 위치 저장 (필터링 전)
+                const currentCursorPosition = input.selectionStart || 0;
+                const cursorOffset = inputValue.length - numericValue.length;
+                
+                // 상태 업데이트
+                setTraceNumber(numericValue);
+                
+                // 포커스와 커서 위치 복원
+                setTimeout(() => {
+                  if (traceNumberInputRef.current) {
+                    traceNumberInputRef.current.focus();
+                    // 커서 위치를 숫자만 필터링된 값 기준으로 조정
+                    const newCursorPosition = Math.max(0, currentCursorPosition - cursorOffset);
+                    traceNumberInputRef.current.setSelectionRange(newCursorPosition, newCursorPosition);
+                  }
+                }, 0);
               }}
               placeholder="이력번호를 입력해주세요."
               className="w-full px-4 py-4 pr-12 bg-transparent rounded-xl focus:outline-none text-sm text-gray-800 placeholder-gray-400"
