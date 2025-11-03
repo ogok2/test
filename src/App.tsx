@@ -99,7 +99,8 @@ const LivestockPlatform = () => {
   const [selectedMarketProductFromHome, setSelectedMarketProductFromHome] = useState<Product | null>(null);
   const [receiptStep, setReceiptStep] = useState<'scan' | 'result'>('scan'); // 영수증 인증 단계
   const [showEvaluation, setShowEvaluation] = useState(false); // 평가 항목 표시 여부
-  const [showAdPage, setShowAdPage] = useState(false); // 광고 페이지 표시 여부
+  const [showAdPage, setShowAdPage] = useState(false);
+  const [isLoadingTrace, setIsLoadingTrace] = useState(false); // 이력번호 조회 로딩 상태
 
   // 랜딩 페이지 (초기 화면)
   const LandingPage = () => (
@@ -448,19 +449,155 @@ const LivestockPlatform = () => {
               className="w-full px-4 py-4 pr-12 bg-transparent rounded-xl focus:outline-none text-sm text-gray-800 placeholder-gray-400"
             />
             <button
-              onClick={() => {
-                if (traceNumber.trim()) {
+              onClick={async () => {
+                if (!traceNumber.trim()) {
+                  alert('이력번호를 입력해주세요.');
+                  return;
+                }
+
+                setIsLoadingTrace(true);
+                try {
+                  // 실제 축산물이력제 API 호출 (XML 형식)
+                  // 환경변수 설정: .env 파일에 VITE_LIVESTOCK_API_URL과 VITE_LIVESTOCK_API_KEY 추가
+                  const apiUrl = (import.meta.env as any).VITE_LIVESTOCK_API_URL || 'http://apis.data.go.kr/B553895/livestockTraceInfo/getTraceInfo';
+                  const apiKey = (import.meta.env as any).VITE_LIVESTOCK_API_KEY || 'HkT9qKFhfICWmSiYDTjV1YOsHsplf3p8TH6uIZ5Etrx3jBmUdGv3R+sqzDniDMlT5SL+QGz4fGJFBFC41GynuA==';
+                  const cleanTraceNumber = traceNumber.trim().replace(/\s/g, '');
+                  
+                  // 공공데이터 API 형식으로 URL 구성
+                  // 실제 API 문서에 맞춰 파라미터 이름을 수정해야 할 수 있습니다
+                  const params = new URLSearchParams({
+                    serviceKey: encodeURIComponent(apiKey),
+                    traceNo: cleanTraceNumber,
+                    numOfRows: '10',
+                    pageNo: '1'
+                  });
+                  
+                  const fullUrl = `${apiUrl}?${params.toString()}`;
+                  
+                  // API 호출 (XML 응답)
+                  const response = await fetch(fullUrl, {
+                    method: 'GET',
+                    headers: {
+                      'Accept': 'application/xml, text/xml, */*'
+                    }
+                  });
+
+                  if (response.ok) {
+                    const xmlText = await response.text();
+                    
+                    // XML 파싱
+                    const parser = new DOMParser();
+                    const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+                    
+                    // XML 오류 체크
+                    const errorNode = xmlDoc.querySelector('error');
+                    if (errorNode) {
+                      const errorMsg = errorNode.textContent || 'API 오류가 발생했습니다.';
+                      alert(errorMsg);
+                      setIsLoadingTrace(false);
+                      return;
+                    }
+                    
+                    // XML에서 데이터 추출 (실제 API 응답 구조에 맞춰 수정 필요)
+                    const getTextContent = (selector: string, defaultVal: string = '') => {
+                      const node = xmlDoc.querySelector(selector);
+                      return node ? node.textContent || defaultVal : defaultVal;
+                    };
+                    
+                    // XML 응답을 JSON으로 변환
+                    const apiData: any = {
+                      traceNumber: getTextContent('traceNo') || cleanTraceNumber,
+                      name: getTextContent('prdtNm') || getTextContent('productName') || '축산물',
+                      breed: getTextContent('lvsKindNm') || getTextContent('breed') || '한우',
+                      birthDate: getTextContent('birthDt') || getTextContent('birthDate'),
+                      monthAge: parseInt(getTextContent('monthAge') || getTextContent('age') || '0'),
+                      gender: getTextContent('sexNm') || getTextContent('gender'),
+                      farmOwner: getTextContent('farmOwnerNm') || getTextContent('farmOwner') || getTextContent('ownerNm'),
+                      farmId: getTextContent('farmNo') || getTextContent('farmId'),
+                      farmLocation: getTextContent('farmAddr') || getTextContent('farmLocation'),
+                      butcherDate: getTextContent('slghDt') || getTextContent('butcherDate') || getTextContent('slaughterDate'),
+                      butcherPlace: getTextContent('slghNm') || getTextContent('butcherPlace') || getTextContent('slaughterPlace'),
+                      butcherLocation: getTextContent('slghAddr') || getTextContent('butcherLocation'),
+                      inspectionResult: getTextContent('inspResult') || getTextContent('inspectionResult'),
+                      carcassWeight: getTextContent('carcassWt') || getTextContent('carcassWeight') || getTextContent('weight'),
+                      meatGrade: getTextContent('meatGrade') || getTextContent('grade'),
+                      packingPlace: getTextContent('packNm') || getTextContent('packingPlace'),
+                      packingLocation: getTextContent('packAddr') || getTextContent('packingLocation')
+                    };
+                    
+                    // API 응답 데이터를 Product 형식으로 변환
+                    const apiProduct: Product = {
+                      id: 999,
+                      name: apiData.name || '축산물',
+                      origin: apiData.farmLocation || '',
+                      rating: 4.5,
+                      reviews: 0,
+                      image: '🥩',
+                      tags: ['저탄소'],
+                      farmer: apiData.farmOwner || '',
+                      taste: 4.5,
+                      color: 4.5,
+                      aroma: 4.5,
+                      fat: 4.5,
+                      traceNumber: apiData.traceNumber || cleanTraceNumber,
+                      birthDate: apiData.birthDate,
+                      monthAge: apiData.monthAge,
+                      breed: apiData.breed || '한우',
+                      gender: apiData.gender,
+                      farmOwner: apiData.farmOwner,
+                      farmId: apiData.farmId,
+                      farmLocation: apiData.farmLocation,
+                      butcherDate: apiData.butcherDate,
+                      butcherPlace: apiData.butcherPlace,
+                      butcherLocation: apiData.butcherLocation,
+                      inspectionResult: apiData.inspectionResult,
+                      carcassWeight: apiData.carcassWeight,
+                      meatGrade: apiData.meatGrade,
+                      packingPlace: apiData.packingPlace,
+                      packingLocation: apiData.packingLocation
+                    };
+
+                    setSelectedProduct(apiProduct);
+                  } else {
+                    // API 오류 처리
+                    const errorText = await response.text();
+                    try {
+                      // XML 오류 응답 파싱
+                      const parser = new DOMParser();
+                      const xmlDoc = parser.parseFromString(errorText, 'text/xml');
+                      const errorMsg = xmlDoc.querySelector('message')?.textContent || 
+                                     xmlDoc.querySelector('errorMsg')?.textContent || 
+                                     '이력번호를 찾을 수 없습니다.';
+                      alert(errorMsg);
+                    } catch {
+                      alert(`API 호출 오류 (${response.status}): 이력번호를 찾을 수 없습니다.`);
+                    }
+                  }
+                } catch (error) {
+                  // 네트워크 오류 또는 API 호출 실패 시 로컬 데이터로 폴백
+                  console.error('API 호출 오류:', error);
                   const foundProduct = products.find(p => p.traceNumber?.replace(/\s/g, '') === traceNumber.trim().replace(/\s/g, ''));
                   if (foundProduct) {
                     setSelectedProduct(foundProduct);
                   } else {
                     alert('입력하신 이력번호로 제품을 찾을 수 없습니다.\n샘플: 002178626230 또는 003289145235');
                   }
+                } finally {
+                  setIsLoadingTrace(false);
                 }
               }}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 p-2 hover:bg-gray-100 rounded-lg transition-colors active:scale-95"
+              disabled={isLoadingTrace}
+              className={`absolute right-3 top-1/2 transform -translate-y-1/2 p-2 rounded-lg transition-colors active:scale-95 ${
+                isLoadingTrace 
+                  ? 'bg-gray-200 cursor-not-allowed' 
+                  : 'hover:bg-gray-100'
+              }`}
             >
-              <Search size={20} className="text-gray-700" strokeWidth={2.5} />
+              {isLoadingTrace ? (
+                <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                <Search size={20} className="text-gray-700" strokeWidth={2.5} />
+              )}
             </button>
           </div>
         </div>

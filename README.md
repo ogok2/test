@@ -70,3 +70,15 @@ npm run preview
 - Tailwind CSS
 - Lucide React (아이콘)
 
+## 환경 변수 설정
+
+프로젝트 루트에 `.env` 파일을 생성하여 다음 환경 변수를 설정하세요:
+
+```env
+# 축산물이력제 API 설정
+VITE_LIVESTOCK_API_URL=http://apis.data.go.kr/B553895/livestockTraceInfo/getTraceInfo
+VITE_LIVESTOCK_API_KEY=HkT9qKFhfICWmSiYDTjV1YOsHsplf3p8TH6uIZ5Etrx3jBmUdGv3R+sqzDniDMlT5SL+QGz4fGJFBFC41GynuA==
+```
+
+**참고**: 실제 API 엔드포인트 URL과 파라미터명은 API 문서에 맞춰 수정이 필요할 수 있습니다.
+
