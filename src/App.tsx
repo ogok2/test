@@ -2291,7 +2291,7 @@ const LivestockPlatform = () => {
                   label="1. 구매하신 상품은 만족하시나요?"
                   value={evaluation.satisfaction}
                   onChange={(v) => setEvaluation({...evaluation, satisfaction: v})}
-                  options={['맛있어요', '보통이에요', '아쉬어워요']}
+                  options={['맛있어요', '보통이에요', '아쉬워요']}
                 />
 
                 <OptionSelect
