@@ -662,7 +662,20 @@ const LivestockPlatform = () => {
                     pageNo: '1'
                   });
                   
-                  const fullUrl = `${apiUrl}?${params.toString()}`;
+                  let fullUrl = `${apiUrl}?${params.toString()}`;
+                  
+                  // CORS 오류를 피하기 위해 프록시 사용 (공공데이터 API는 브라우저에서 직접 호출 시 CORS 오류 발생 가능)
+                  // 대안 1: CORS 프록시 사용 (개발용)
+                  const useProxy = false; // 필요시 true로 변경
+                  if (useProxy) {
+                    fullUrl = `https://cors-anywhere.herokuapp.com/${fullUrl}`;
+                  }
+                  
+                  // 대안 2: HTTPS로 변경 시도 (http -> https)
+                  if (fullUrl.startsWith('http://')) {
+                    fullUrl = fullUrl.replace('http://', 'https://');
+                  }
+                  
                   console.log('🌐 전체 API URL:', fullUrl);
                   
                   // API 호출 (XML 응답)
@@ -670,7 +683,13 @@ const LivestockPlatform = () => {
                     method: 'GET',
                     headers: {
                       'Accept': 'application/xml, text/xml, */*'
-                    }
+                    },
+                    mode: 'cors', // CORS 모드 명시
+                    cache: 'no-cache'
+                  }).catch((fetchError) => {
+                    // fetch 자체가 실패한 경우 (CORS, 네트워크 오류 등)
+                    console.error('❌ fetch 호출 실패:', fetchError);
+                    throw fetchError;
                   });
                   
                   console.log('📥 API 응답 상태:', response.status, response.statusText);
@@ -828,10 +847,14 @@ const LivestockPlatform = () => {
                   console.error('❌ 오류 스택:', error.stack);
                   
                   // CORS 오류 체크
-                  if (error.message?.includes('CORS') || error.message?.includes('cors')) {
-                    alert('⚠️ CORS 오류가 발생했습니다.\nAPI 서버에서 CORS 설정이 필요합니다.\n\n임시로 로컬 샘플 데이터를 사용합니다.');
+                  if (error.message?.includes('CORS') || error.message?.includes('cors') || error.name === 'TypeError') {
+                    if (error.message?.includes('Failed to fetch')) {
+                      alert(`⚠️ API 호출 실패 (CORS/네트워크 오류)\n\n원인:\n1. 공공데이터 API는 브라우저에서 직접 호출 시 CORS 오류가 발생할 수 있습니다\n2. 네트워크 연결 문제일 수 있습니다\n3. API 서버가 응답하지 않을 수 있습니다\n\n해결 방법:\n- 서버 측에서 API를 호출하는 것이 권장됩니다\n- 또는 CORS 프록시를 사용할 수 있습니다\n\n임시로 로컬 샘플 데이터를 사용합니다.\n\n샘플 이력번호: 002178626230 또는 003289145235`);
+                    } else {
+                      alert('⚠️ CORS 오류가 발생했습니다.\nAPI 서버에서 CORS 설정이 필요합니다.\n\n임시로 로컬 샘플 데이터를 사용합니다.');
+                    }
                   } else if (error.message?.includes('Failed to fetch')) {
-                    alert('⚠️ 네트워크 오류가 발생했습니다.\n인터넷 연결을 확인하거나 API 서버 상태를 확인하세요.\n\n임시로 로컬 샘플 데이터를 사용합니다.');
+                    alert(`⚠️ 네트워크 오류가 발생했습니다.\n\n원인:\n1. 인터넷 연결 문제\n2. API 서버가 응답하지 않음\n3. 방화벽 또는 네트워크 제한\n\n인터넷 연결을 확인하거나 API 서버 상태를 확인하세요.\n\n임시로 로컬 샘플 데이터를 사용합니다.\n\n샘플 이력번호: 002178626230 또는 003289145235`);
                   }
                   
                   // 로컬 데이터로 폴백
