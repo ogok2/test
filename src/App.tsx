@@ -483,6 +483,9 @@ const LivestockPlatform = () => {
                   const apiKey = (import.meta.env as any).VITE_LIVESTOCK_API_KEY || 'HkT9qKFhfICWmSiYDTjV1YOsHsplf3p8TH6uIZ5Etrx3jBmUdGv3R+sqzDniDMlT5SL+QGz4fGJFBFC41GynuA==';
                   const cleanTraceNumber = traceNumber.trim().replace(/\s/g, '');
                   
+                  console.log('🔍 이력번호 조회 시작:', cleanTraceNumber);
+                  console.log('📡 API URL:', apiUrl);
+                  
                   // 공공데이터 API 형식으로 URL 구성
                   // 실제 API 문서에 맞춰 파라미터 이름을 수정해야 할 수 있습니다
                   const params = new URLSearchParams({
@@ -493,6 +496,7 @@ const LivestockPlatform = () => {
                   });
                   
                   const fullUrl = `${apiUrl}?${params.toString()}`;
+                  console.log('🌐 전체 API URL:', fullUrl);
                   
                   // API 호출 (XML 응답)
                   const response = await fetch(fullUrl, {
@@ -501,49 +505,79 @@ const LivestockPlatform = () => {
                       'Accept': 'application/xml, text/xml, */*'
                     }
                   });
+                  
+                  console.log('📥 API 응답 상태:', response.status, response.statusText);
 
                   if (response.ok) {
                     const xmlText = await response.text();
+                    console.log('📄 XML 응답:', xmlText.substring(0, 500)); // 처음 500자만 로그
                     
                     // XML 파싱
                     const parser = new DOMParser();
                     const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
                     
                     // XML 오류 체크
-                    const errorNode = xmlDoc.querySelector('error');
+                    const errorNode = xmlDoc.querySelector('error, resultCode, returnCode');
                     if (errorNode) {
-                      const errorMsg = errorNode.textContent || 'API 오류가 발생했습니다.';
-                      alert(errorMsg);
+                      const errorMsg = errorNode.textContent || xmlDoc.querySelector('resultMsg')?.textContent || 'API 오류가 발생했습니다.';
+                      const errorCode = xmlDoc.querySelector('resultCode, returnCode')?.textContent || '';
+                      console.error('❌ API 오류:', errorCode, errorMsg);
+                      alert(`API 오류 (${errorCode}): ${errorMsg}`);
                       setIsLoadingTrace(false);
                       return;
                     }
                     
+                    // 데이터 노드 확인
+                    const dataNode = xmlDoc.querySelector('item, body > items > item, response > body > items > item');
+                    if (!dataNode) {
+                      console.warn('⚠️ API 응답에 데이터가 없습니다. XML 구조:', xmlText.substring(0, 1000));
+                      // 데이터가 없어도 구조 확인을 위해 계속 진행
+                    }
+                    
                     // XML에서 데이터 추출 (실제 API 응답 구조에 맞춰 수정 필요)
-                    const getTextContent = (selector: string, defaultVal: string = '') => {
-                      const node = xmlDoc.querySelector(selector);
-                      return node ? node.textContent || defaultVal : defaultVal;
+                    const getTextContent = (selectors: string[], defaultVal: string = '') => {
+                      // item 내부에서 먼저 찾고, 없으면 전체에서 찾기
+                      const itemNode = dataNode || xmlDoc;
+                      for (const selector of selectors) {
+                        let node = itemNode.querySelector(selector);
+                        if (!node) {
+                          node = xmlDoc.querySelector(selector);
+                        }
+                        if (node && node.textContent) {
+                          return node.textContent.trim();
+                        }
+                      }
+                      return defaultVal;
                     };
                     
+                    // XML 응답 구조 디버깅
+                    console.log('🔍 XML 구조 확인:', xmlDoc.querySelector('body, response, items')?.tagName);
+                    console.log('🔍 Item 노드:', dataNode?.tagName, dataNode ? Array.from(dataNode.children).map(c => c.tagName) : '없음');
+                    
                     // XML 응답을 JSON으로 변환
+                    // 실제 API 응답 구조에 맞춰 필드명을 조정해야 함
+                    // 여러 필드명을 순서대로 시도
                     const apiData: any = {
-                      traceNumber: getTextContent('traceNo') || cleanTraceNumber,
-                      name: getTextContent('prdtNm') || getTextContent('productName') || '축산물',
-                      breed: getTextContent('lvsKindNm') || getTextContent('breed') || '한우',
-                      birthDate: getTextContent('birthDt') || getTextContent('birthDate'),
-                      monthAge: parseInt(getTextContent('monthAge') || getTextContent('age') || '0'),
-                      gender: getTextContent('sexNm') || getTextContent('gender'),
-                      farmOwner: getTextContent('farmOwnerNm') || getTextContent('farmOwner') || getTextContent('ownerNm'),
-                      farmId: getTextContent('farmNo') || getTextContent('farmId'),
-                      farmLocation: getTextContent('farmAddr') || getTextContent('farmLocation'),
-                      butcherDate: getTextContent('slghDt') || getTextContent('butcherDate') || getTextContent('slaughterDate'),
-                      butcherPlace: getTextContent('slghNm') || getTextContent('butcherPlace') || getTextContent('slaughterPlace'),
-                      butcherLocation: getTextContent('slghAddr') || getTextContent('butcherLocation'),
-                      inspectionResult: getTextContent('inspResult') || getTextContent('inspectionResult'),
-                      carcassWeight: getTextContent('carcassWt') || getTextContent('carcassWeight') || getTextContent('weight'),
-                      meatGrade: getTextContent('meatGrade') || getTextContent('grade'),
-                      packingPlace: getTextContent('packNm') || getTextContent('packingPlace'),
-                      packingLocation: getTextContent('packAddr') || getTextContent('packingLocation')
+                      traceNumber: getTextContent(['traceNo', 'trace_no', '이력번호']) || cleanTraceNumber,
+                      name: getTextContent(['prdtNm', 'productName', '제품명']) || '축산물',
+                      breed: getTextContent(['lvsKindNm', 'breed', '축종']) || '한우',
+                      birthDate: getTextContent(['birthDt', 'birthDate', '출생일']),
+                      monthAge: parseInt(getTextContent(['monthAge', 'age', '월령']) || '0'),
+                      gender: getTextContent(['sexNm', 'gender', '성별']),
+                      farmOwner: getTextContent(['farmOwnerNm', 'farmOwner', 'ownerNm', '농가주명']),
+                      farmId: getTextContent(['farmNo', 'farmId', '농장번호']),
+                      farmLocation: getTextContent(['farmAddr', 'farmLocation', '농장주소']),
+                      butcherDate: getTextContent(['slghDt', 'butcherDate', 'slaughterDate', '도축일']),
+                      butcherPlace: getTextContent(['slghNm', 'butcherPlace', 'slaughterPlace', '도축장명']),
+                      butcherLocation: getTextContent(['slghAddr', 'butcherLocation', '도축장주소']),
+                      inspectionResult: getTextContent(['inspResult', 'inspectionResult', '검사결과']),
+                      carcassWeight: getTextContent(['carcassWt', 'carcassWeight', 'weight', '도체중량']),
+                      meatGrade: getTextContent(['meatGrade', 'grade', '등급']),
+                      packingPlace: getTextContent(['packNm', 'packingPlace', '포장장명']),
+                      packingLocation: getTextContent(['packAddr', 'packingLocation', '포장장주소'])
                     };
+                    
+                    console.log('📊 추출된 API 데이터:', apiData);
                     
                     // API 응답 데이터를 Product 형식으로 변환
                     const apiProduct: Product = {
@@ -578,29 +612,46 @@ const LivestockPlatform = () => {
                     };
 
                     setSelectedProduct(apiProduct);
+                    console.log('✅ API 조회 성공! 제품 정보:', apiProduct.name);
                   } else {
                     // API 오류 처리
                     const errorText = await response.text();
+                    console.error('❌ API 호출 실패:', response.status, errorText.substring(0, 500));
                     try {
                       // XML 오류 응답 파싱
                       const parser = new DOMParser();
                       const xmlDoc = parser.parseFromString(errorText, 'text/xml');
-                      const errorMsg = xmlDoc.querySelector('message')?.textContent || 
-                                     xmlDoc.querySelector('errorMsg')?.textContent || 
+                      const errorCode = xmlDoc.querySelector('resultCode, returnCode, code')?.textContent || '';
+                      const errorMsg = xmlDoc.querySelector('message, errorMsg, resultMsg')?.textContent || 
                                      '이력번호를 찾을 수 없습니다.';
-                      alert(errorMsg);
-                    } catch {
-                      alert(`API 호출 오류 (${response.status}): 이력번호를 찾을 수 없습니다.`);
+                      console.error('❌ API 오류 코드:', errorCode, '메시지:', errorMsg);
+                      alert(`API 오류 (${response.status}${errorCode ? `, ${errorCode}` : ''}): ${errorMsg}`);
+                    } catch (parseError) {
+                      console.error('❌ 오류 파싱 실패:', parseError);
+                      alert(`API 호출 오류 (${response.status}): 이력번호를 찾을 수 없습니다.\n\n콘솔을 확인하여 자세한 오류 정보를 확인하세요.`);
                     }
                   }
-                } catch (error) {
+                } catch (error: any) {
                   // 네트워크 오류 또는 API 호출 실패 시 로컬 데이터로 폴백
-                  console.error('API 호출 오류:', error);
+                  console.error('❌ API 호출 중 예외 발생:', error);
+                  console.error('❌ 오류 메시지:', error.message);
+                  console.error('❌ 오류 스택:', error.stack);
+                  
+                  // CORS 오류 체크
+                  if (error.message?.includes('CORS') || error.message?.includes('cors')) {
+                    alert('⚠️ CORS 오류가 발생했습니다.\nAPI 서버에서 CORS 설정이 필요합니다.\n\n임시로 로컬 샘플 데이터를 사용합니다.');
+                  } else if (error.message?.includes('Failed to fetch')) {
+                    alert('⚠️ 네트워크 오류가 발생했습니다.\n인터넷 연결을 확인하거나 API 서버 상태를 확인하세요.\n\n임시로 로컬 샘플 데이터를 사용합니다.');
+                  }
+                  
+                  // 로컬 데이터로 폴백
                   const foundProduct = products.find(p => p.traceNumber?.replace(/\s/g, '') === traceNumber.trim().replace(/\s/g, ''));
                   if (foundProduct) {
+                    console.log('📦 로컬 샘플 데이터 사용:', foundProduct.name);
                     setSelectedProduct(foundProduct);
+                    alert('⚠️ API 호출 실패로 인해 샘플 데이터를 표시합니다.\n\n실제 API 연동을 위해서는 개발자 도구 콘솔을 확인하세요.');
                   } else {
-                    alert('입력하신 이력번호로 제품을 찾을 수 없습니다.\n샘플: 002178626230 또는 003289145235');
+                    alert(`❌ 입력하신 이력번호로 제품을 찾을 수 없습니다.\n\n샘플: 002178626230 또는 003289145235\n\nAPI 오류 정보는 콘솔을 확인하세요.`);
                   }
                 } finally {
                   setIsLoadingTrace(false);
