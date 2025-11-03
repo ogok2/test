@@ -510,25 +510,54 @@ const LivestockPlatform = () => {
                     const parser = new DOMParser();
                     const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
                     
-                    // 오류 체크
-                    const errorNode = xmlDoc.querySelector('error, resultCode, returnCode');
-                    if (errorNode) {
-                      const errorMsg = errorNode.textContent || xmlDoc.querySelector('resultMsg')?.textContent || 'API 오류가 발생했습니다.';
-                      const errorCode = xmlDoc.querySelector('resultCode, returnCode')?.textContent || '';
-                      console.error('❌ 전체 목록 API 오류:', errorCode, errorMsg);
-                      alert(`API 오류 (${errorCode}): ${errorMsg}`);
+                    // XML 전체 구조 확인 (디버깅용)
+                    console.log('🔍 XML 루트:', xmlDoc.documentElement.tagName);
+                    console.log('🔍 XML 전체 구조:', xmlDoc.documentElement.outerHTML.substring(0, 1000));
+                    
+                    // 오류 체크 (다양한 오류 형식 확인)
+                    const errorNode = xmlDoc.querySelector('error, resultCode, returnCode, cmmMsgHeader');
+                    const resultCode = xmlDoc.querySelector('resultCode, returnCode, code')?.textContent || '';
+                    const resultMsg = xmlDoc.querySelector('resultMsg, message, errorMsg, msg')?.textContent || '';
+                    
+                    // resultCode가 있고 '00'이 아니면 오류로 간주
+                    if (resultCode && resultCode !== '00' && resultCode !== '0') {
+                      console.error('❌ 전체 목록 API 오류 코드:', resultCode);
+                      console.error('❌ 전체 목록 API 오류 메시지:', resultMsg || errorNode?.textContent);
+                      alert(`API 오류 (코드: ${resultCode}): ${resultMsg || errorNode?.textContent || '전체 목록 조회가 지원되지 않을 수 있습니다.'}\n\n참고: 이 API는 특정 이력번호 조회만 지원할 수 있습니다.`);
                       setIsLoadingList(false);
                       return;
                     }
                     
-                    // 전체 개수 확인
-                    const totalCountNode = xmlDoc.querySelector('totalCount, totalCount');
-                    const totalCount = parseInt(totalCountNode?.textContent || '0');
+                    // 전체 개수 확인 (다양한 위치 확인)
+                    let totalCount = 0;
+                    const totalCountSelectors = ['totalCount', 'totalCnt', 'total', 'count', 'recordCount'];
+                    for (const selector of totalCountSelectors) {
+                      const node = xmlDoc.querySelector(selector);
+                      if (node && node.textContent) {
+                        totalCount = parseInt(node.textContent);
+                        if (totalCount > 0) break;
+                      }
+                    }
                     setListTotalCount(totalCount);
+                    console.log('📊 전체 개수:', totalCount);
                     
-                    // item 노드들 찾기
-                    const items = xmlDoc.querySelectorAll('item, body > items > item, response > body > items > item');
+                    // item 노드들 찾기 (다양한 구조 확인)
+                    let items: NodeListOf<Element> = xmlDoc.querySelectorAll('item');
+                    if (items.length === 0) {
+                      items = xmlDoc.querySelectorAll('body > items > item, response > body > items > item, items > item');
+                    }
+                    if (items.length === 0) {
+                      items = xmlDoc.querySelectorAll('[traceNo], [trace_no], [이력번호]');
+                    }
                     console.log('📊 찾은 아이템 개수:', items.length);
+                    
+                    // 아이템이 없으면 XML 구조 출력
+                    if (items.length === 0) {
+                      console.warn('⚠️ 아이템을 찾을 수 없습니다. XML 구조:', xmlText);
+                      alert('⚠️ 전체 목록에 데이터가 없거나 API 응답 구조가 다릅니다.\n\n콘솔에서 XML 구조를 확인하세요.\n\n참고: 이 API는 전체 목록 조회를 지원하지 않을 수 있습니다. 특정 이력번호만 조회 가능합니다.');
+                      setIsLoadingList(false);
+                      return;
+                    }
                     
                     const getTextContent = (node: Element, selectors: string[], defaultVal: string = '') => {
                       for (const selector of selectors) {
@@ -584,7 +613,18 @@ const LivestockPlatform = () => {
                   }
                 } catch (error: any) {
                   console.error('❌ 전체 목록 조회 중 예외 발생:', error);
-                  alert('⚠️ 전체 목록 조회 중 오류가 발생했습니다.\n\n콘솔을 확인하세요.');
+                  console.error('❌ 오류 타입:', error.constructor.name);
+                  console.error('❌ 오류 메시지:', error.message);
+                  console.error('❌ 오류 스택:', error.stack);
+                  
+                  // CORS 오류 체크
+                  if (error.message?.includes('CORS') || error.message?.includes('cors') || error.name === 'TypeError') {
+                    alert('⚠️ CORS 오류가 발생했습니다.\n\nAPI 서버에서 CORS 설정이 필요하거나, 이 API는 브라우저에서 직접 호출할 수 없을 수 있습니다.\n\n참고: 공공데이터 API는 서버 측에서 호출해야 할 수 있습니다.');
+                  } else if (error.message?.includes('Failed to fetch')) {
+                    alert('⚠️ 네트워크 오류가 발생했습니다.\n\n인터넷 연결을 확인하거나 API 서버 상태를 확인하세요.');
+                  } else {
+                    alert(`⚠️ 전체 목록 조회 중 오류가 발생했습니다.\n\n오류: ${error.message || error.toString()}\n\n콘솔에서 자세한 정보를 확인하세요.\n\n참고: 이 API는 전체 목록 조회를 지원하지 않을 수 있습니다.`);
+                  }
                 } finally {
                   setIsLoadingList(false);
                 }
