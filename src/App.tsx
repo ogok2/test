@@ -677,28 +677,51 @@ const LivestockPlatform = () => {
 
                   if (response.ok) {
                     const xmlText = await response.text();
-                    console.log('📄 XML 응답:', xmlText.substring(0, 500)); // 처음 500자만 로그
+                    console.log('📄 XML 응답:', xmlText.substring(0, 1000)); // 처음 1000자 로그
                     
                     // XML 파싱
                     const parser = new DOMParser();
                     const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
                     
-                    // XML 오류 체크
-                    const errorNode = xmlDoc.querySelector('error, resultCode, returnCode');
-                    if (errorNode) {
-                      const errorMsg = errorNode.textContent || xmlDoc.querySelector('resultMsg')?.textContent || 'API 오류가 발생했습니다.';
-                      const errorCode = xmlDoc.querySelector('resultCode, returnCode')?.textContent || '';
-                      console.error('❌ API 오류:', errorCode, errorMsg);
-                      alert(`API 오류 (${errorCode}): ${errorMsg}`);
+                    // XML 전체 구조 확인 (디버깅용)
+                    console.log('🔍 XML 루트:', xmlDoc.documentElement.tagName);
+                    console.log('🔍 XML 전체 구조:', xmlDoc.documentElement.outerHTML.substring(0, 1000));
+                    
+                    // 오류 체크 (다양한 오류 형식 확인)
+                    const resultCode = xmlDoc.querySelector('resultCode, returnCode, code, resultCode')?.textContent || '';
+                    const resultMsg = xmlDoc.querySelector('resultMsg, message, errorMsg, msg, resultMsg')?.textContent || '';
+                    const errorNode = xmlDoc.querySelector('error, resultCode, returnCode, cmmMsgHeader');
+                    
+                    // resultCode가 있고 '00'이 아니면 오류로 간주
+                    if (resultCode && resultCode !== '00' && resultCode !== '0' && resultCode !== '') {
+                      console.error('❌ API 오류 코드:', resultCode);
+                      console.error('❌ API 오류 메시지:', resultMsg || errorNode?.textContent);
+                      alert(`API 오류 (코드: ${resultCode}): ${resultMsg || errorNode?.textContent || '이력번호를 찾을 수 없습니다.'}\n\n입력하신 이력번호: ${cleanTraceNumber}\n\n참고: 올바른 이력번호를 입력했는지 확인하세요.`);
                       setIsLoadingTrace(false);
                       return;
                     }
                     
-                    // 데이터 노드 확인
-                    const dataNode = xmlDoc.querySelector('item, body > items > item, response > body > items > item');
+                    // resultCode가 없거나 '00'일 때도 데이터가 없을 수 있음
+                    if (resultCode === '00' || resultCode === '0' || resultCode === '') {
+                      // 데이터 노드 확인
+                      const dataNode = xmlDoc.querySelector('item, body > items > item, response > body > items > item');
+                      if (!dataNode) {
+                        console.warn('⚠️ API 응답에 데이터가 없습니다. XML 구조:', xmlText.substring(0, 1000));
+                        console.warn('⚠️ 전체 XML:', xmlText);
+                        alert(`입력하신 이력번호 '${cleanTraceNumber}'로 제품을 찾을 수 없습니다.\n\n원인:\n1. 존재하지 않는 이력번호일 수 있습니다\n2. API 응답 구조가 다를 수 있습니다\n\n콘솔에서 XML 응답을 확인하세요.`);
+                        setIsLoadingTrace(false);
+                        return;
+                      }
+                    }
+                    
+                    // 데이터 노드 확인 (이미 위에서 확인했으므로 다시 찾기)
+                    let dataNode = xmlDoc.querySelector('item, body > items > item, response > body > items > item');
                     if (!dataNode) {
-                      console.warn('⚠️ API 응답에 데이터가 없습니다. XML 구조:', xmlText.substring(0, 1000));
-                      // 데이터가 없어도 구조 확인을 위해 계속 진행
+                      // 다양한 구조 시도
+                      dataNode = xmlDoc.querySelector('item');
+                      if (!dataNode) {
+                        dataNode = xmlDoc.querySelector('[traceNo], [trace_no], [이력번호]') as Element;
+                      }
                     }
                     
                     // XML에서 데이터 추출 (실제 API 응답 구조에 맞춰 수정 필요)
