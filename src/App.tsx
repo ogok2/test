@@ -491,14 +491,26 @@ const LivestockPlatform = () => {
                     pageNo: '1'
                   });
                   
-                  const fullUrl = `${apiUrl}?${params.toString()}`;
+                  let fullUrl = `${apiUrl}?${params.toString()}`;
+                  
+                  // CORS 오류를 피하기 위해 HTTPS로 변경 시도 (http -> https)
+                  if (fullUrl.startsWith('http://')) {
+                    fullUrl = fullUrl.replace('http://', 'https://');
+                  }
+                  
                   console.log('🌐 전체 목록 API URL:', fullUrl);
                   
                   const response = await fetch(fullUrl, {
                     method: 'GET',
                     headers: {
                       'Accept': 'application/xml, text/xml, */*'
-                    }
+                    },
+                    mode: 'cors', // CORS 모드 명시
+                    cache: 'no-cache'
+                  }).catch((fetchError) => {
+                    // fetch 자체가 실패한 경우 (CORS, 네트워크 오류 등)
+                    console.error('❌ 전체 목록 fetch 호출 실패:', fetchError);
+                    throw fetchError;
                   });
                   
                   console.log('📥 전체 목록 API 응답 상태:', response.status);
