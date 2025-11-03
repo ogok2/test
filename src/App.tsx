@@ -139,9 +139,7 @@ const LivestockPlatform = () => {
             <div className="pt-4 border-t border-gray-200">
               <div className="text-xs text-gray-500 mb-2 font-semibold tracking-wider uppercase">기본 정보</div>
               <p className="text-sm text-gray-700 leading-relaxed">
-                이 고기는 <span className="font-bold text-green-600">2024년 6월</span>에 도축된  
-                <span className="font-bold text-green-600"> 28개월령</span> 
-                <span className="font-bold text-green-600"> 1+등급 한우</span>입니다.
+                이 소는 <span className="font-bold text-green-600">2024년 6월</span>에 도축된 <span className="font-bold text-green-600">1+ 등급 한우</span>입니다.
                 <br />
                 <span className="inline-block mt-3 px-4 py-1.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full text-xs font-bold shadow-md">
                   ✓ 동물복지 인증 농장
@@ -361,7 +359,7 @@ const LivestockPlatform = () => {
         <div className="text-center text-7xl mb-4">🐂</div>
         <h2 className="text-lg font-bold text-gray-800 mb-3">안녕하세요?</h2>
         <p className="text-gray-700 leading-relaxed mb-4">
-          해당 고기는 <span className="font-bold text-green-600">2024년 6월</span>에 도축된 <span className="font-bold text-green-600">1+한우</span>입니다. 
+          이 소는 <span className="font-bold text-green-600">2024년 6월</span>에 도축된 <span className="font-bold text-green-600">1+ 등급 한우</span>입니다. 
           <span className="inline-block mt-2 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">동물복지 인증 농장</span>
         </p>
         <p className="text-sm text-gray-600 mb-4">
