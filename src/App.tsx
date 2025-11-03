@@ -134,14 +134,14 @@ const LivestockPlatform = () => {
           <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-6 mb-6 shadow-inner border border-gray-100">
             <div className="mb-4">
               <div className="text-xs text-gray-500 mb-1 font-semibold tracking-wider uppercase">도축날짜</div>
-              <div className="text-2xl font-bold text-gray-800">2024년 10월</div>
+              <div className="text-2xl font-bold text-gray-800">2024년 6월</div>
             </div>
             <div className="pt-4 border-t border-gray-200">
               <div className="text-xs text-gray-500 mb-2 font-semibold tracking-wider uppercase">기본 정보</div>
               <p className="text-sm text-gray-700 leading-relaxed">
-                이 고기는 <span className="font-bold text-green-600">2024년 10월</span>에 도축된  
+                이 고기는 <span className="font-bold text-green-600">2024년 6월</span>에 도축된  
                 <span className="font-bold text-green-600"> 28개월령</span> 
-                <span className="font-bold text-green-600"> 1++등급 한우</span>입니다.
+                <span className="font-bold text-green-600"> 1+등급 한우</span>입니다.
                 <br />
                 <span className="inline-block mt-3 px-4 py-1.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full text-xs font-bold shadow-md">
                   ✓ 동물복지 인증 농장
@@ -173,12 +173,12 @@ const LivestockPlatform = () => {
   const products: Product[] = [
     {
       id: 1,
-      name: '한우 1++ 등심',
+      name: '한우 1+ 등심',
       origin: '충남 홍성',
       rating: 4.8,
       reviews: 127,
       image: '🥩',
-      tags: ['저탄소', '1++등급'],
+      tags: ['저탄소', '1+등급'],
       farmer: '',
       taste: 4.9,
       color: 4.7,
@@ -256,13 +256,13 @@ const LivestockPlatform = () => {
     {
       id: 1,
       category: 'review',
-      title: '홍성 한우 1++ 등심 먹어봤는데 진짜 대박!',
+      title: '홍성 한우 1+ 등심 먹어봤는데 진짜 대박!',
       author: '고기마니아',
-      content: '어제 홍성에서 온 1++ 등심 먹었는데 진짜 입에서 녹아요...',
+      content: '어제 홍성에서 온 1+ 등심 먹었는데 진짜 입에서 녹아요...',
       image: '🥩',
       likes: 156,
       comments: 23,
-      tags: ['한우', '1++', '등심'],
+      tags: ['한우', '1+', '등심'],
       isHot: true,
       time: '2시간 전'
     },
@@ -361,7 +361,7 @@ const LivestockPlatform = () => {
         <div className="text-center text-7xl mb-4">🐂</div>
         <h2 className="text-lg font-bold text-gray-800 mb-3">안녕하세요?</h2>
         <p className="text-gray-700 leading-relaxed mb-4">
-          해당 고기는 <span className="font-bold text-green-600">2024년 10월</span>에 도축된 <span className="font-bold text-green-600">1++한우</span>입니다. 
+          해당 고기는 <span className="font-bold text-green-600">2024년 6월</span>에 도축된 <span className="font-bold text-green-600">1+한우</span>입니다. 
           <span className="inline-block mt-2 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">동물복지 인증 농장</span>
         </p>
         <p className="text-sm text-gray-600 mb-4">
@@ -1307,7 +1307,7 @@ const LivestockPlatform = () => {
     // 상품 가격 정보 (실제로는 products에 추가해야 함)
     const getProductPrice = (productId: number) => {
       const prices: { [key: number]: number } = {
-        1: 15000, // 한우 1++ 등심
+        1: 15000, // 한우 1+ 등심
         2: 12000  // 돼지 삼겹살
       };
       return prices[productId] || 15000;
