@@ -102,6 +102,10 @@ const LivestockPlatform = () => {
   const [showEvaluation, setShowEvaluation] = useState(false); // 평가 항목 표시 여부
   const [showAdPage, setShowAdPage] = useState(false);
   const [isLoadingTrace, setIsLoadingTrace] = useState(false); // 이력번호 조회 로딩 상태
+  const [traceList, setTraceList] = useState<Product[]>([]); // 전체 이력번호 목록
+  const [isLoadingList, setIsLoadingList] = useState(false); // 전체 목록 조회 로딩 상태
+  const [listPage, setListPage] = useState(1); // 전체 목록 페이지 번호
+  const [listTotalCount, setListTotalCount] = useState(0); // 전체 목록 총 개수
 
   // 랜딩 페이지 (초기 화면)
   const LandingPage = () => (
@@ -468,6 +472,129 @@ const LivestockPlatform = () => {
               placeholder="이력번호를 입력해주세요."
               className="w-full px-4 py-4 pr-12 bg-transparent rounded-xl focus:outline-none text-sm text-gray-800 placeholder-gray-400"
             />
+            
+            {/* 전체 목록 조회 버튼 */}
+            <button
+              onClick={async () => {
+                setIsLoadingList(true);
+                setListPage(1);
+                try {
+                  const apiUrl = (import.meta.env as any).VITE_LIVESTOCK_API_URL || 'http://apis.data.go.kr/B553895/livestockTraceInfo/getTraceInfo';
+                  const apiKey = (import.meta.env as any).VITE_LIVESTOCK_API_KEY || 'HkT9qKFhfICWmSiYDTjV1YOsHsplf3p8TH6uIZ5Etrx3jBmUdGv3R+sqzDniDMlT5SL+QGz4fGJFBFC41GynuA==';
+                  
+                  console.log('📋 전체 목록 조회 시작');
+                  
+                  // 전체 목록 조회 (traceNo 파라미터 제거)
+                  const params = new URLSearchParams({
+                    serviceKey: encodeURIComponent(apiKey),
+                    numOfRows: '100', // 한 번에 가져올 최대 개수
+                    pageNo: '1'
+                  });
+                  
+                  const fullUrl = `${apiUrl}?${params.toString()}`;
+                  console.log('🌐 전체 목록 API URL:', fullUrl);
+                  
+                  const response = await fetch(fullUrl, {
+                    method: 'GET',
+                    headers: {
+                      'Accept': 'application/xml, text/xml, */*'
+                    }
+                  });
+                  
+                  console.log('📥 전체 목록 API 응답 상태:', response.status);
+                  
+                  if (response.ok) {
+                    const xmlText = await response.text();
+                    console.log('📄 전체 목록 XML 응답:', xmlText.substring(0, 500));
+                    
+                    const parser = new DOMParser();
+                    const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+                    
+                    // 오류 체크
+                    const errorNode = xmlDoc.querySelector('error, resultCode, returnCode');
+                    if (errorNode) {
+                      const errorMsg = errorNode.textContent || xmlDoc.querySelector('resultMsg')?.textContent || 'API 오류가 발생했습니다.';
+                      const errorCode = xmlDoc.querySelector('resultCode, returnCode')?.textContent || '';
+                      console.error('❌ 전체 목록 API 오류:', errorCode, errorMsg);
+                      alert(`API 오류 (${errorCode}): ${errorMsg}`);
+                      setIsLoadingList(false);
+                      return;
+                    }
+                    
+                    // 전체 개수 확인
+                    const totalCountNode = xmlDoc.querySelector('totalCount, totalCount');
+                    const totalCount = parseInt(totalCountNode?.textContent || '0');
+                    setListTotalCount(totalCount);
+                    
+                    // item 노드들 찾기
+                    const items = xmlDoc.querySelectorAll('item, body > items > item, response > body > items > item');
+                    console.log('📊 찾은 아이템 개수:', items.length);
+                    
+                    const getTextContent = (node: Element, selectors: string[], defaultVal: string = '') => {
+                      for (const selector of selectors) {
+                        const foundNode = node.querySelector(selector);
+                        if (foundNode && foundNode.textContent) {
+                          return foundNode.textContent.trim();
+                        }
+                      }
+                      return defaultVal;
+                    };
+                    
+                    // 각 item을 Product 형식으로 변환
+                    const productList: Product[] = Array.from(items).map((item, index) => {
+                      const traceNo = getTextContent(item, ['traceNo', 'trace_no', '이력번호']) || '';
+                      return {
+                        id: 1000 + index,
+                        name: getTextContent(item, ['prdtNm', 'productName', '제품명']) || '축산물',
+                        origin: getTextContent(item, ['farmAddr', 'farmLocation', '농장주소']) || '',
+                        rating: 4.5,
+                        reviews: 0,
+                        image: '🥩',
+                        tags: ['저탄소'],
+                        farmer: getTextContent(item, ['farmOwnerNm', 'farmOwner', 'ownerNm', '농가주명']) || '',
+                        taste: 4.5,
+                        color: 4.5,
+                        aroma: 4.5,
+                        fat: 4.5,
+                        traceNumber: traceNo,
+                        birthDate: getTextContent(item, ['birthDt', 'birthDate', '출생일']),
+                        monthAge: parseInt(getTextContent(item, ['monthAge', 'age', '월령']) || '0'),
+                        breed: getTextContent(item, ['lvsKindNm', 'breed', '축종']) || '한우',
+                        gender: getTextContent(item, ['sexNm', 'gender', '성별']),
+                        farmOwner: getTextContent(item, ['farmOwnerNm', 'farmOwner', 'ownerNm', '농가주명']),
+                        farmId: getTextContent(item, ['farmNo', 'farmId', '농장번호']),
+                        farmLocation: getTextContent(item, ['farmAddr', 'farmLocation', '농장주소']),
+                        butcherDate: getTextContent(item, ['slghDt', 'butcherDate', 'slaughterDate', '도축일']),
+                        butcherPlace: getTextContent(item, ['slghNm', 'butcherPlace', 'slaughterPlace', '도축장명']),
+                        butcherLocation: getTextContent(item, ['slghAddr', 'butcherLocation', '도축장주소']),
+                        inspectionResult: getTextContent(item, ['inspResult', 'inspectionResult', '검사결과']),
+                        carcassWeight: getTextContent(item, ['carcassWt', 'carcassWeight', 'weight', '도체중량']),
+                        meatGrade: getTextContent(item, ['meatGrade', 'grade', '등급']),
+                        packingPlace: getTextContent(item, ['packNm', 'packingPlace', '포장장명']),
+                        packingLocation: getTextContent(item, ['packAddr', 'packingLocation', '포장장주소'])
+                      };
+                    }).filter(product => product.traceNumber); // 이력번호가 있는 것만 필터링
+                    
+                    console.log('✅ 전체 목록 조회 성공! 개수:', productList.length);
+                    setTraceList(productList);
+                  } else {
+                    const errorText = await response.text();
+                    console.error('❌ 전체 목록 API 호출 실패:', response.status, errorText.substring(0, 500));
+                    alert(`전체 목록 조회 실패 (${response.status}): 콘솔을 확인하세요.`);
+                  }
+                } catch (error: any) {
+                  console.error('❌ 전체 목록 조회 중 예외 발생:', error);
+                  alert('⚠️ 전체 목록 조회 중 오류가 발생했습니다.\n\n콘솔을 확인하세요.');
+                } finally {
+                  setIsLoadingList(false);
+                }
+              }}
+              disabled={isLoadingList}
+              className="absolute right-12 top-1/2 transform -translate-y-1/2 px-3 py-1.5 text-xs font-semibold bg-blue-500 text-white rounded-lg hover:bg-blue-600 active:scale-95 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+            >
+              {isLoadingList ? '조회중...' : '전체목록'}
+            </button>
+            
             <button
               onClick={async () => {
                 if (!traceNumber.trim()) {
